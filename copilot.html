@@ -138,4 +138,578 @@
 
     .btn-primary:hover {
       filter: brightness(1.05);
-      box-shadow: 0 0 30px rgba(
+      box-shadow: 0 0 30px rgba(232,107,216,0.45);
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+      border-color: rgba(148,163,184,0.6);
+      color: #e5e7eb;
+      background: rgba(15,23,42,0.7);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .hero-right {
+      position: relative;
+      min-height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .core-orbit {
+      position: relative;
+      width: 260px;
+      height: 260px;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(250,250,250,0.9) 0, transparent 55%),
+        radial-gradient(circle at 70% 80%, rgba(56,189,248,0.9) 0, transparent 60%),
+        radial-gradient(circle at 20% 80%, rgba(232,121,249,0.9) 0, transparent 60%);
+      box-shadow:
+        0 0 40px rgba(58,175,255,0.5),
+        0 0 80px rgba(232,107,216,0.35);
+      overflow: hidden;
+    }
+
+    .core-orbit::before {
+      content: "";
+      position: absolute;
+      inset: 18%;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      box-shadow: 0 0 25px rgba(59,130,246,0.5);
+      background:
+        radial-gradient(circle at 30% 30%, rgba(15,23,42,0.4) 0, transparent 55%),
+        radial-gradient(circle at 70% 70%, rgba(15,23,42,0.7) 0, transparent 60%);
+    }
+
+    .core-grid {
+      position: absolute;
+      inset: 10%;
+      border-radius: 999px;
+      background-image:
+        linear-gradient(90deg, rgba(15,23,42,0.8) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(15,23,42,0.8) 1px, transparent 1px);
+      background-size: 18px 18px;
+      mix-blend-mode: soft-light;
+      opacity: 0.7;
+    }
+
+    .core-nodes {
+      position: absolute;
+      inset: 18%;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(248,250,252,0.9) 0, transparent 40%),
+        radial-gradient(circle at 60% 40%, rgba(56,189,248,0.9) 0, transparent 45%),
+        radial-gradient(circle at 40% 70%, rgba(232,121,249,0.9) 0, transparent 45%);
+      mix-blend-mode: screen;
+      opacity: 0.9;
+    }
+
+    .orbit-ring {
+      position: absolute;
+      inset: 6%;
+      border-radius: 999px;
+      border: 1px dashed rgba(148,163,184,0.6);
+      transform: rotate(-18deg);
+      box-shadow: 0 0 18px rgba(148,163,184,0.4);
+    }
+
+    .orbit-film {
+      position: absolute;
+      width: 130%;
+      height: 40%;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.7);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(18deg);
+      background:
+        linear-gradient(90deg, rgba(15,23,42,0.9) 0, rgba(15,23,42,0.2) 40%, rgba(15,23,42,0.9) 100%);
+      box-shadow:
+        0 0 25px rgba(59,130,246,0.6),
+        0 0 35px rgba(232,121,249,0.5);
+      overflow: hidden;
+    }
+
+    .orbit-film::before {
+      content: "";
+      position: absolute;
+      inset: 18%;
+      border-radius: 999px;
+      border-top: 1px solid rgba(148,163,184,0.7);
+      border-bottom: 1px solid rgba(148,163,184,0.7);
+      opacity: 0.7;
+    }
+
+    .waveform {
+      position: absolute;
+      left: -10%;
+      right: -10%;
+      top: 50%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(56,189,248,0.9), rgba(232,121,249,0.9), transparent);
+      box-shadow: 0 0 18px rgba(56,189,248,0.8);
+      transform: translateY(-50%);
+    }
+
+    .waveform::before,
+    .waveform::after {
+      content: "";
+      position: absolute;
+      inset: -10px 20%;
+      background:
+        radial-gradient(circle at 10% 50%, rgba(56,189,248,0.9) 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, rgba(248,250,252,0.9) 0, transparent 55%),
+        radial-gradient(circle at 90% 50%, rgba(232,121,249,0.9) 0, transparent 55%);
+      opacity: 0.7;
+      mix-blend-mode: screen;
+    }
+
+    .waveform::after {
+      opacity: 0.4;
+      filter: blur(4px);
+    }
+
+    .hero-right .hex {
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      border: 1px solid rgba(148,163,184,0.7);
+      transform: rotate(30deg);
+      box-shadow: 0 0 12px rgba(148,163,184,0.5);
+      opacity: 0.7;
+    }
+
+    .hex.hex-1 { top: 8%; left: 10%; }
+    .hex.hex-2 { bottom: 12%; right: 8%; width: 22px; height: 22px; opacity: 0.5; }
+    .hex.hex-3 { top: 18%; right: 18%; width: 18px; height: 18px; opacity: 0.6; }
+
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 3.5rem;
+    }
+
+    section {
+      margin-bottom: 2.75rem;
+    }
+
+    h2.section-title {
+      font-size: 1.35rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .section-title span {
+      color: var(--accent);
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, rgba(15,23,42,0.9) 0, #020617 55%);
+      border-radius: 0.9rem;
+      border: 1px solid var(--border);
+      padding: 1.25rem 1.3rem 1.3rem;
+      box-shadow: 0 18px 40px rgba(15,23,42,0.9);
+    }
+
+    .card h3 {
+      font-size: 1.05rem;
+      margin-bottom: 0.35rem;
+      color: #e5e7eb;
+    }
+
+    .card .tagline {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      color: #d1d5db;
+      margin-bottom: 0.75rem;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.25rem;
+    }
+
+    .pill {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      color: #e5e7eb;
+      background: rgba(15,23,42,0.7);
+    }
+
+    .link-row {
+      margin-top: 0.6rem;
+      font-size: 0.85rem;
+    }
+
+    .link-row a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      gap: 1.75rem;
+    }
+
+    @media (max-width: 900px) {
+      .two-col {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    ul li {
+      margin-bottom: 0.4rem;
+      font-size: 0.9rem;
+      color: #d1d5db;
+    }
+
+    footer {
+      border-top: 1px solid rgba(31,41,55,0.9);
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      background: #020617;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="hero">
+      <div class="hero-left">
+        <h1>
+          <span class="hybrid">HYBRID</span>
+          <span class="studio">INTELLIGENCE STUDIO</span>
+        </h1>
+        <div class="hero-subtitle">
+          ARTIFICIAL INTELLIGENCE · CODING · MULTIMEDIA
+        </div>
+        <p class="hero-tagline">
+          Building systems that think, speak, visualize, and collaborate — blending Generative AI, agents, data, voice, and storytelling.
+        </p>
+        <p class="hero-meta">
+          <strong>David Fliesen</strong> · Hybrid Generative AI Multimedia Developer
+        </p>
+        <div class="hero-cta">
+          <a class="btn-primary" href="#projects">View Flagship Projects</a>
+          <a class="btn-ghost" href="#contact">Let’s Collaborate</a>
+        </div>
+      </div>
+
+      <div class="hero-right" aria-hidden="true">
+        <div class="core-orbit">
+          <div class="core-grid"></div>
+          <div class="core-nodes"></div>
+          <div class="orbit-ring"></div>
+          <div class="orbit-film">
+            <div class="waveform"></div>
+          </div>
+        </div>
+        <div class="hex hex-1"></div>
+        <div class="hex hex-2"></div>
+        <div class="hex hex-3"></div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="about">
+      <h2 class="section-title"><span>About</span> Me</h2>
+      <div class="two-col">
+        <div>
+          <p style="color:#e5e7eb; margin-bottom:0.75rem;">
+            I’m a hybrid developer–creator working at the intersection of <strong>Generative AI</strong>, <strong>agentic systems</strong>,
+            <strong>multimedia storytelling</strong>, and <strong>creative technology</strong>. I design and build systems that combine
+            LLMs, RAG pipelines, data analytics, conversational agents, voice AI, image generation, and interactive media.
+          </p>
+          <p style="color:#d1d5db;">
+            My work explores how humans and AI can co‑create — from business intelligence dashboards and agentic assistants
+            to comics, music, and voice‑driven experiences.
+          </p>
+        </div>
+        <div>
+          <ul>
+            <li><strong>Focus:</strong> Generative AI · RAG · Agents · Creative Workflows</li>
+            <li><strong>Mediums:</strong> Data · Voice · Image · Comics · Music</li>
+            <li><strong>Background:</strong> Early virtual world AI, defense research, AI education, and creative tech.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects">
+      <h2 class="section-title"><span>Flagship</span> Projects</h2>
+      <div class="card-grid">
+        <article class="card">
+          <h3>InsightForge – AI Business Intelligence Dashboard</h3>
+          <div class="tagline">Capstone Project · Purdue Online / Simplilearn</div>
+          <p>
+            A fully functional AI‑powered BI dashboard combining LangChain RAG, FAISS CPU index, GPT‑40‑mini,
+            HuggingFace MiniLM, a chatbot tied to BI sales data, a D‑ID voice‑enabled AI analyst avatar (WebRTC),
+            interactive Plotly visualizations, FastAPI backend, HTML frontend, and an ngrok tunnel into a Google Colab app
+            with no local installation required.
+          </p>
+          <div class="pill-row">
+            <span class="pill">LangChain RAG</span>
+            <span class="pill">FAISS</span>
+            <span class="pill">GPT‑40‑mini</span>
+            <span class="pill">MiniLM</span>
+            <span class="pill">FastAPI</span>
+            <span class="pill">Plotly</span>
+          </div>
+          <div class="link-row">
+            <a href="https://youtu.be/s0zfirf2sdk?si=hmrFdQ0LLmqN8QnY" target="_blank" rel="noopener">
+              ▶ Watch Demo
+            </a>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Aladdin’s News Genie (ANG)</h3>
+          <div class="tagline">AI‑Powered News & Information Assistant</div>
+          <p>
+            A real‑time news intelligence assistant that combines curated live news feeds with an LLM‑powered chat interface.
+            Users can query the latest stories across key domains and explore news through a conversational experience.
+          </p>
+          <div class="pill-row">
+            <span class="pill">Agentic Frameworks</span>
+            <span class="pill">News APIs</span>
+            <span class="pill">Conversational UI</span>
+          </div>
+          <div class="link-row">
+            <a href="https://youtu.be/BxsDoSwnzKo" target="_blank" rel="noopener">
+              ▶ Watch Demo
+            </a>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Prompt‑Based AI Image Generator</h3>
+          <div class="tagline">Creative Workflow Demo · OpenAI + Gradio</div>
+          <p>
+            A generative image app built with the OpenAI API and a Gradio interface to demonstrate creative workflows.
+            Developed in Python on Google Colab as part of a “Building LLMs” course, it mirrors the prompt‑to‑image
+            experience of modern AI tools.
+          </p>
+          <div class="pill-row">
+            <span class="pill">OpenAI API</span>
+            <span class="pill">Gradio</span>
+            <span class="pill">Python</span>
+            <span class="pill">Google Colab</span>
+          </div>
+          <div class="link-row">
+            <a href="https://youtu.be/Qq5K601TFcg" target="_blank" rel="noopener">
+              ▶ Watch Demo
+            </a>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>The Sisters of Summerville – AI‑Human Comics</h3>
+          <div class="tagline">Daily Comic Strip · AI Testbed</div>
+          <p>
+            A collaborative AI‑human comic series about a dog and a cat, created as a daily practice in AI‑assisted
+            storytelling. This project explores character consistency, visual style iteration, and the user perspective
+            for a future Comics AI app.
+          </p>
+          <div class="pill-row">
+            <span class="pill">Comics</span>
+            <span class="pill">Storytelling</span>
+            <span class="pill">AI Art</span>
+          </div>
+          <div class="link-row">
+            <a href="https://sisters-of-summerville.github.io/Sisters-of-Summerville/" target="_blank" rel="noopener">
+              📚 Read the Comics
+            </a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="in-development">
+      <h2 class="section-title"><span>In</span> Development</h2>
+      <div class="card-grid">
+        <article class="card">
+          <h3>Multi‑Agent Banking Support Assistant</h3>
+          <div class="tagline">Agentic Financial Support · Under Development</div>
+          <p>
+            A multi‑agent system concept for banking support, designed to handle customer queries, task automation,
+            and intelligent routing across financial workflows.
+          </p>
+        </article>
+
+        <article class="card">
+          <h3>Agentic Healthcare Task Automation</h3>
+          <div class="tagline">Healthcare Workflow Intelligence · Under Development</div>
+          <p>
+            Conceptual work on AI agents for healthcare, focusing on patient workflows, scheduling, triage support,
+            and operational efficiency.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section id="early-ai">
+      <h2 class="section-title"><span>Early</span> AI Work</h2>
+      <div class="card-grid">
+        <article class="card">
+          <h3>Sun Tzu 3D Smart Agent – Virtual World AI</h3>
+          <div class="tagline">Second Life · Virtual Intelligence Pioneer</div>
+          <p>
+            A conversational agent in Second Life capable of local text chat, web scraping for real‑time answers,
+            guided 3D tours, emotion modeling, avatar movement, teleportation, instant messaging, and Twitter updates.
+            Built using AIML and AAML in collaboration with the University of Edinburgh and the Army Research Lab.
+          </p>
+          <p>
+            Presented at ModSim World Canada, GameTech Orlando, and MODSIM World as part of U.S. Joint Forces Command
+            futures research and the IEEE Artificial Intelligence Learning Center in Second Life.
+          </p>
+          <div class="link-row">
+            <a href="http://prezi.com/bcjqn-zkxvxh/" target="_blank" rel="noopener">
+              📝 Virtual Intelligence – ModSim World Canada
+            </a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="music">
+      <h2 class="section-title"><span>AI</span> Music</h2>
+      <div class="two-col">
+        <div>
+          <p style="color:#e5e7eb; margin-bottom:0.75rem;">
+            I compose AI‑assisted music, including a track that won a Suno music contest. My catalog explores narrative,
+            humor, and emotional storytelling through lyrics and vocal performance.
+          </p>
+          <div class="link-row" style="margin-bottom:0.5rem;">
+            <a href="https://suno.com/s/7nriDWlurEagQD9X" target="_blank" rel="noopener">
+              🎧 Featured Track
+            </a>
+          </div>
+          <div class="link-row">
+            <a href="https://suno.com/@cibola" target="_blank" rel="noopener">
+              🎵 Full Suno Profile
+            </a>
+          </div>
+        </div>
+        <div>
+          <ul>
+            <li>Last Call (on the old me)</li>
+            <li>The Bee’s Knees (and the cat’s pajamas)</li>
+            <li>Cutting Through Me Like Lightning</li>
+            <li>Small Town</li>
+            <li>ChatGPT Just Gypped Me!</li>
+            <li>Rush Rush Rush</li>
+            <li>Front Porch Swings (all doggone day)</li>
+            <li>Femme Fatale of the Feline World</li>
+            <li>Cast It All Away</li>
+            <li>We Are One (cover planned)</li>
+            <li>Sounds That Clash (cover planned)</li>
+            <li>On Like Donky Kong (redo planned)</li>
+            <li>TikTok Chaos (cover planned)</li>
+            <li>Venmo You My Soul? (cover planned)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="multimedia">
+      <h2 class="section-title"><span>Multimedia</span> & Voice</h2>
+      <div class="card-grid">
+        <article class="card">
+          <h3>AI‑Enhanced Voice Work</h3>
+          <div class="tagline">Voice Over · Character · AI Voices</div>
+          <p>
+            Voice acting and AI‑enhanced voice work across characters, narration, and experimental audio projects.
+          </p>
+          <div class="link-row">
+            <a href="https://www.voices.com/profile/suntzu" target="_blank" rel="noopener">
+              🎙 Voice Portfolio
+            </a>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Multimedia & Character Animation</h3>
+          <div class="tagline">Visual Storytelling · Animation</div>
+          <p>
+            Multimedia projects and character animation work exploring narrative, timing, and expressive performance.
+          </p>
+          <div class="link-row">
+            <a href="https://character-animator.weebly.com" target="_blank" rel="noopener">
+              🎬 Multimedia Work
+            </a>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Cibola Studios</h3>
+          <div class="tagline">Creative Technology Studio</div>
+          <p>
+            A personal studio space where AI, storytelling, sound, and visual media intersect.
+          </p>
+          <div class="link-row">
+            <a href="https://cibolastudios.weebly.com" target="_blank" rel="noopener">
+              🏛 Studio Site
+            </a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="contact">
+      <h2 class="section-title"><span>Let’s</span> Connect</h2>
+      <p style="color:#d1d5db; max-width:640px;">
+        I’m interested in roles and collaborations at the intersection of <strong>Generative AI</strong>, <strong>agentic systems</strong>,
+        and <strong>multimedia storytelling</strong> — from AI labs and innovation teams to creative technology studios.
+        If you’re building the future of AI‑powered creativity, I’d love to talk.
+      </p>
+      <p style="color:#9ca3af; margin-top:0.75rem;">
+        You can reach me via GitHub, LinkedIn, or the contact options on my studio and portfolio sites.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    Hybrid Intelligence Studio · © <span id="year"></span> David Fliesen
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

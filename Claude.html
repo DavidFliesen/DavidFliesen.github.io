@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>David Fliesen · Hybrid Generative AI Multimedia Developer</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c10;
+    --bg2: #0d1219;
+    --grid: rgba(0,255,200,0.04);
+    --cyan: #00ffe0;
+    --gold: #f0c040;
+    --rose: #ff4f6a;
+    --text: #c8d8e8;
+    --muted: #5a7080;
+    --card: rgba(13,22,32,0.85);
+    --border: rgba(0,255,200,0.15);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── Grid Background ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  /* ── Noise overlay ── */
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .wrap { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 32px; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    backdrop-filter: blur(16px);
+    background: rgba(8,12,16,0.8);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 0;
+  }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 13px; font-weight: 700; letter-spacing: 0.15em;
+    color: var(--cyan);
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.12em;
+    color: var(--muted); text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--cyan); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding-top: 80px;
+    position: relative;
+  }
+  .hero-glow {
+    position: absolute; top: 20%; right: -10%;
+    width: 600px; height: 600px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,255,200,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--cyan); margin-bottom: 24px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .hero-tag::before {
+    content: ''; display: block; width: 32px; height: 1px; background: var(--cyan);
+  }
+  h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(36px, 6vw, 72px);
+    font-weight: 900; line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .name-david { color: #fff; }
+  .name-fliesen {
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--cyan);
+  }
+  .hero-subtitle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--gold); margin: 20px 0 32px;
+  }
+  .hero-desc {
+    max-width: 560px; font-size: 19px; font-weight: 300;
+    color: var(--text); opacity: 0.85; line-height: 1.75;
+    margin-bottom: 44px;
+  }
+  .hero-desc em { color: var(--cyan); font-style: italic; }
+  .btn-row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 14px 28px; border-radius: 2px; text-decoration: none;
+    transition: all 0.25s; cursor: pointer; border: none;
+    display: inline-block;
+  }
+  .btn-primary {
+    background: var(--cyan); color: var(--bg);
+    font-weight: 700;
+  }
+  .btn-primary:hover { background: #fff; box-shadow: 0 0 24px rgba(0,255,200,0.4); }
+  .btn-outline {
+    background: transparent; color: var(--cyan);
+    border: 1px solid var(--cyan);
+  }
+  .btn-outline:hover { background: rgba(0,255,200,0.08); }
+
+  /* ── SECTION HEADERS ── */
+  .section { padding: 100px 0; }
+  .sec-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--rose); margin-bottom: 12px;
+  }
+  .sec-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(22px, 3.5vw, 36px);
+    font-weight: 700; color: #fff;
+    margin-bottom: 52px;
+    position: relative; display: inline-block;
+  }
+  .sec-title::after {
+    content: ''; position: absolute; bottom: -10px; left: 0;
+    width: 60px; height: 2px; background: var(--cyan);
+  }
+
+  /* ── PROJECT CARDS ── */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 32px;
+    position: relative;
+    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--cyan), transparent);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.4s;
+  }
+  .card:hover { transform: translateY(-4px); border-color: rgba(0,255,200,0.35); box-shadow: 0 16px 48px rgba(0,0,0,0.4); }
+  .card:hover::before { transform: scaleX(1); }
+  .card-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 2px; display: inline-block;
+    margin-bottom: 20px;
+  }
+  .badge-cap { background: rgba(0,255,200,0.12); color: var(--cyan); border: 1px solid rgba(0,255,200,0.25); }
+  .badge-course { background: rgba(240,192,64,0.12); color: var(--gold); border: 1px solid rgba(240,192,64,0.25); }
+  .badge-dev { background: rgba(255,79,106,0.12); color: var(--rose); border: 1px solid rgba(255,79,106,0.25); }
+  .badge-legacy { background: rgba(120,80,200,0.12); color: #b090ff; border: 1px solid rgba(120,80,200,0.25); }
+  .card h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px; font-weight: 700; color: #fff;
+    margin-bottom: 14px; line-height: 1.3;
+  }
+  .card p {
+    font-size: 16px; color: var(--text); opacity: 0.8;
+    line-height: 1.7; margin-bottom: 20px;
+  }
+  .tech-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+  .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    color: var(--muted); padding: 3px 8px; border-radius: 2px;
+  }
+  .card-link {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.1em;
+    color: var(--cyan); text-decoration: none;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: gap 0.2s;
+  }
+  .card-link:hover { gap: 10px; }
+  .card-link::after { content: '→'; }
+  .card-wip { opacity: 0.5; }
+  .card-wip .card-badge { background: rgba(90,112,128,0.15); color: var(--muted); border-color: rgba(90,112,128,0.2); }
+
+  /* ── MUSIC SECTION ── */
+  .music-inner {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start;
+  }
+  .music-desc { font-size: 18px; font-weight: 300; opacity: 0.85; margin-bottom: 24px; }
+  .music-link {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--gold); text-decoration: none; letter-spacing: 0.1em;
+    border: 1px solid rgba(240,192,64,0.3);
+    padding: 12px 20px; border-radius: 2px;
+    transition: all 0.2s; margin-bottom: 40px;
+  }
+  .music-link:hover { background: rgba(240,192,64,0.08); }
+  .song-list { list-style: none; }
+  .song-list li {
+    font-family: 'Crimson Pro', serif;
+    font-size: 17px; font-style: italic;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: var(--text); opacity: 0.75;
+    display: flex; justify-content: space-between; align-items: center;
+    transition: opacity 0.2s;
+  }
+  .song-list li:hover { opacity: 1; }
+  .song-list li.winner { color: var(--gold); opacity: 1; font-weight: 400; }
+  .trophy { font-size: 13px; }
+  .song-wip {
+    font-family: 'JetBrains Mono', monospace; font-size: 9px;
+    color: var(--muted); letter-spacing: 0.1em; font-style: normal;
+    background: rgba(90,112,128,0.1); padding: 2px 6px; border-radius: 2px;
+  }
+
+  /* ── MULTIMEDIA ── */
+  .media-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .media-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 4px; padding: 28px; text-align: center;
+    transition: transform 0.3s, border-color 0.3s;
+  }
+  .media-card:hover { transform: translateY(-3px); border-color: rgba(240,192,64,0.3); }
+  .media-icon { font-size: 32px; margin-bottom: 16px; }
+  .media-card h4 {
+    font-family: 'Orbitron', sans-serif; font-size: 12px;
+    font-weight: 700; color: var(--gold); letter-spacing: 0.1em;
+    margin-bottom: 10px;
+  }
+  .media-card p { font-size: 15px; opacity: 0.7; margin-bottom: 16px; }
+  .media-card a {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    letter-spacing: 0.1em; color: var(--cyan); text-decoration: none;
+  }
+  .media-card a:hover { text-decoration: underline; }
+
+  /* ── HISTORY TIMELINE ── */
+  .timeline { position: relative; padding-left: 28px; }
+  .timeline::before {
+    content: ''; position: absolute; left: 0; top: 8px; bottom: 8px;
+    width: 1px; background: linear-gradient(to bottom, var(--cyan), transparent);
+  }
+  .tl-item { position: relative; margin-bottom: 40px; }
+  .tl-item::before {
+    content: ''; position: absolute; left: -33px; top: 8px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--bg); border: 2px solid var(--cyan);
+  }
+  .tl-year {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.2em; color: var(--cyan);
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  .tl-item h4 {
+    font-family: 'Orbitron', sans-serif; font-size: 14px;
+    font-weight: 700; color: #fff; margin-bottom: 8px;
+  }
+  .tl-item p { font-size: 16px; opacity: 0.75; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 0;
+    text-align: center;
+  }
+  .footer-name {
+    font-family: 'Orbitron', sans-serif; font-size: 18px;
+    font-weight: 900; color: var(--cyan); letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+  .footer-sub {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .footer-links { display: flex; justify-content: center; gap: 28px; }
+  .footer-links a {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    letter-spacing: 0.12em; color: var(--muted); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--cyan); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+  .cursor::after { content: '_'; animation: blink 1s step-end infinite; color: var(--cyan); }
+  .hero > .wrap > * { animation: fadeUp 0.7s both; }
+  .hero > .wrap > :nth-child(1) { animation-delay: 0.1s; }
+  .hero > .wrap > :nth-child(2) { animation-delay: 0.25s; }
+  .hero > .wrap > :nth-child(3) { animation-delay: 0.4s; }
+  .hero > .wrap > :nth-child(4) { animation-delay: 0.55s; }
+  .hero > .wrap > :nth-child(5) { animation-delay: 0.7s; }
+
+  @media (max-width: 768px) {
+    .music-inner { grid-template-columns: 1fr; }
+    .media-grid { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="wrap">
+    <a class="nav-logo" href="#">FLIESEN.DEV</a>
+    <ul class="nav-links">
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#music">Music</a></li>
+      <li><a href="#multimedia">Multimedia</a></li>
+      <li><a href="#history">History</a></li>
+      <li><a href="https://linkedin.com/in/fliesen/" target="_blank">LinkedIn</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="wrap">
+    <div class="hero-tag">Hybrid Generative AI Multimedia Developer</div>
+    <h1>
+      <span class="name-david">David</span><br>
+      <span class="name-fliesen cursor">Fliesen</span>
+    </h1>
+    <div class="hero-subtitle">Artificial Intelligence &nbsp;·&nbsp; Creative Technology &nbsp;·&nbsp; Multimedia</div>
+    <p class="hero-desc">
+      Building <em>intelligent systems</em> at the intersection of generative AI, interactive media, and creative storytelling — from DoD virtual agents in Second Life to RAG-powered BI dashboards and AI comic strips.
+    </p>
+    <div class="btn-row">
+      <a href="#projects" class="btn btn-primary">View Projects</a>
+      <a href="https://linkedin.com/in/fliesen/" target="_blank" class="btn btn-outline">LinkedIn Profile</a>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section class="section" id="projects">
+  <div class="wrap">
+    <div class="sec-label">// Portfolio</div>
+    <h2 class="sec-title">AI &amp; Code Projects</h2>
+    <div class="projects-grid">
+
+      <!-- InsightForge -->
+      <div class="card">
+        <span class="card-badge badge-cap">Capstone · Purdue Online</span>
+        <h3>InsightForge</h3>
+        <p>AI-powered Business Intelligence Dashboard combining LangChain RAG, FAISS CPU index, GPT-4o-mini, and a D-ID voice-enabled avatar analyst named Sage. No local install — runs entirely in Google Colab via ngrok.</p>
+        <div class="tech-tags">
+          <span class="tag">LangChain</span><span class="tag">RAG</span><span class="tag">FAISS</span>
+          <span class="tag">GPT-4o-mini</span><span class="tag">D-ID</span><span class="tag">Plotly</span>
+          <span class="tag">Streamlit</span><span class="tag">FastAPI</span><span class="tag">ngrok</span>
+        </div>
+        <a href="https://youtu.be/s0zfirf2sdk?si=hmrFdQ0LLmqN8QnY" target="_blank" class="card-link">Watch Demo</a>
+      </div>
+
+      <!-- ANG -->
+      <div class="card">
+        <span class="card-badge badge-course">Agentic Frameworks Course</span>
+        <h3>Aladdin's News Genie (ANG)</h3>
+        <p>AI-powered real-time news assistant with LangGraph routing, live NewsAPI + GNews feeds, and a chatbot interface. Built with Streamlit, deployed via Colab and ngrok with Claude Haiku powering responses.</p>
+        <div class="tech-tags">
+          <span class="tag">LangGraph</span><span class="tag">NewsAPI</span><span class="tag">GNews</span>
+          <span class="tag">Claude Haiku</span><span class="tag">Streamlit</span><span class="tag">Python</span>
+        </div>
+        <a href="https://youtu.be/BxsDoSwnzKo" target="_blank" class="card-link">Watch Demo</a>
+      </div>
+
+      <!-- Image Gen -->
+      <div class="card">
+        <span class="card-badge badge-course">Building LLMs Course</span>
+        <h3>Prompt-Based AI Image Generator</h3>
+        <p>Generative AI app for creating images from natural language prompts, built with the OpenAI API and a Gradio interface inside Google Colab — demonstrating end-to-end creative workflow automation.</p>
+        <div class="tech-tags">
+          <span class="tag">OpenAI API</span><span class="tag">DALL·E</span>
+          <span class="tag">Gradio</span><span class="tag">Python</span><span class="tag">Colab</span>
+        </div>
+        <a href="https://youtu.be/Qq5K601TFcg" target="_blank" class="card-link">Watch Demo</a>
+      </div>
+
+      <!-- Sisters of Summerville -->
+      <div class="card">
+        <span class="card-badge badge-course">Daily AI Testbed</span>
+        <h3>Sisters of Summerville</h3>
+        <p>Daily AI-generated comic strip starring Honey Bear (Yorkie) and Bootsie Belle (tuxedo cat) set in Summerville, SC. A creative multi-AI workflow using ChatGPT, Gemini, Claude, Photoshop, and Firefly — and a living testbed for a comics AI app in development.</p>
+        <div class="tech-tags">
+          <span class="tag">ChatGPT</span><span class="tag">Claude</span><span class="tag">Gemini</span>
+          <span class="tag">Adobe Firefly</span><span class="tag">Photoshop</span><span class="tag">GitHub Pages</span>
+        </div>
+        <a href="https://sisters-of-summerville.github.io/Sisters-of-Summerville/" target="_blank" class="card-link">Visit Archive</a>
+      </div>
+
+      <!-- Banking WIP -->
+      <div class="card card-wip">
+        <span class="card-badge">In Development</span>
+        <h3>Multi-Agent Banking Support Assistant</h3>
+        <p>Agentic architecture for automated banking support workflows — multiple specialized AI agents collaborating on customer-facing tasks.</p>
+        <div class="tech-tags">
+          <span class="tag">Multi-Agent</span><span class="tag">LangGraph</span><span class="tag">Python</span>
+        </div>
+      </div>
+
+      <!-- Sun Tzu -->
+      <div class="card">
+        <span class="card-badge badge-legacy">2008 · Legacy AI</span>
+        <h3>Sun Tzu 3D Virtual Intelligence Agent</h3>
+        <p>Conversational 3D agent deployed in Second Life for DoD and IEEE. Used AIML + AAML, web-scraping APIs (Wikipedia), emotion engine, and avatar automation. Demonstrated at MODSIM World 2009–2010 with the University of Edinburgh and Army Research Lab.</p>
+        <div class="tech-tags">
+          <span class="tag">AIML</span><span class="tag">AAML</span><span class="tag">Second Life</span>
+          <span class="tag">Web Scraping</span><span class="tag">Virtual Worlds</span><span class="tag">DoD</span>
+        </div>
+        <a href="http://prezi.com/bcjqn-zkxvxh/" target="_blank" class="card-link">View Presentation</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- MUSIC -->
+<section class="section" id="music" style="background: linear-gradient(180deg, transparent, rgba(240,192,64,0.03), transparent);">
+  <div class="wrap">
+    <div class="sec-label">// Creative AI</div>
+    <h2 class="sec-title">Suno AI Music</h2>
+    <div class="music-inner">
+      <div>
+        <p class="music-desc">AI-composed original music spanning country, rock, jazz, and pop — including a <strong style="color:var(--gold)">Suno contest winner</strong>. Exploring where artificial intelligence meets genuine artistic voice.</p>
+        <a href="https://suno.com/@cibola" target="_blank" class="music-link">🎵 &nbsp;Listen on Suno @cibola</a>
+        <a href="https://suno.com/s/7nriDWlurEagQD9X" target="_blank" class="music-link" style="display:block; width: fit-content; margin-top: -20px; margin-bottom: 0;">🏆 &nbsp;Contest Winner Playlist</a>
+      </div>
+      <ul class="song-list">
+        <li class="winner"><span>Last Call (on the old me)</span> <span class="trophy">🏆 Contest Winner</span></li>
+        <li><span>The Bee's Knees (and the cat's pajamas)</span></li>
+        <li><span>Cutting Through Me Like Lightning</span></li>
+        <li><span>Small Town</span></li>
+        <li><span>ChatGPT Just Gypped Me!</span></li>
+        <li><span>Rush Rush Rush</span></li>
+        <li><span>Front Porch Swings (all doggone day)</span></li>
+        <li><span>Hello (my brain is numb)</span></li>
+        <li><span>Femme Fatale of the Feline World</span></li>
+        <li><span>Cast It All Away</span></li>
+        <li style="opacity:0.4;"><span>We Are One</span> <span class="song-wip">cover pending</span></li>
+        <li style="opacity:0.4;"><span>Sounds That Clash</span> <span class="song-wip">cover pending</span></li>
+        <li style="opacity:0.4;"><span>On Like Donkey Kong</span> <span class="song-wip">re-recording</span></li>
+        <li style="opacity:0.4;"><span>TikTok Chaos</span> <span class="song-wip">cover pending</span></li>
+        <li style="opacity:0.4;"><span>Venmo You My Soul?</span> <span class="song-wip">cover pending</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- MULTIMEDIA -->
+<section class="section" id="multimedia">
+  <div class="wrap">
+    <div class="sec-label">// Creative Studio</div>
+    <h2 class="sec-title">Multimedia Work</h2>
+    <div class="media-grid">
+      <div class="media-card">
+        <div class="media-icon">🎙️</div>
+        <h4>Voice Over</h4>
+        <p>Professional voice work including AI-enhanced voices, character work, and narration.</p>
+        <a href="https://www.voices.com/profile/suntzu" target="_blank">voices.com/profile/suntzu →</a>
+      </div>
+      <div class="media-card">
+        <div class="media-icon">🎬</div>
+        <h4>Character Animation</h4>
+        <p>Adobe Character Animator, motion graphics, and AI-assisted multimedia production.</p>
+        <a href="https://character-animator.weebly.com" target="_blank">character-animator.weebly.com →</a>
+      </div>
+      <div class="media-card">
+        <div class="media-icon">🎛️</div>
+        <h4>Cibola Studios</h4>
+        <p>Full creative studio portfolio spanning AI, audio, animation, and digital media.</p>
+        <a href="https://cibolastudios.weebly.com" target="_blank">cibolastudios.weebly.com →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HISTORY TIMELINE -->
+<section class="section" id="history">
+  <div class="wrap">
+    <div class="sec-label">// Background</div>
+    <h2 class="sec-title">AI History</h2>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-year">2025 – Present</div>
+        <h4>Purdue Online / Simplilearn — Applied Generative AI Specialization</h4>
+        <p>Building production AI apps: InsightForge (capstone), ANG news genie, AI image generators, RAG pipelines, and the Sisters of Summerville daily comic strip as a living AI testbed.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2010</div>
+        <h4>ModSim World Canada — Virtual Intelligence Presentation</h4>
+        <p>Co-presented "Virtual Intelligence" with David Burden at ModSim World Canada, and also presented at Game Tech Orlando, covering conversational AI agents in virtual worlds.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2009</div>
+        <h4>MODSIM World — Sun Tzu Agent Demo (Virginia Beach)</h4>
+        <p>Demonstrated Sun Tzu's AI capabilities for U.S. Joint Forces Command and DoD futures research, including guided tours, web scraping, emotion engine, and avatar automation in Second Life.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2008 – 2009</div>
+        <h4>University of Edinburgh + Army Research Lab</h4>
+        <p>Developed virtual intelligence using AIML and AAML via Daden Limited. Worked with the Virtual IEEE to establish the Artificial Intelligence Learning Center in Second Life.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="footer-name">DAVID FLIESEN</div>
+    <div class="footer-sub">Hybrid Generative AI Multimedia Developer · Summerville, SC</div>
+    <div class="footer-links">
+      <a href="https://linkedin.com/in/fliesen/" target="_blank">LinkedIn</a>
+      <a href="https://sisters-of-summerville.github.io/Sisters-of-Summerville/" target="_blank">Sisters of Summerville</a>
+      <a href="https://suno.com/@cibola" target="_blank">Suno Music</a>
+      <a href="https://cibolastudios.weebly.com" target="_blank">Cibola Studios</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

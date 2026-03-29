@@ -625,6 +625,112 @@ h1{animation:none;}
 
 <div class="divider"></div>
 
+<!-- ── MUSIC ── -->
+<section class="section" id="music">
+<div class="wrap">
+  <div class="sec-label">// AI Creative</div>
+  <h2 class="sec-title">Suno AI Music</h2>
+  <div class="music-grid">
+    <div>
+      <div class="music-video-embed" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:4px;border:1px solid var(--border2);margin-bottom:18px;">
+        <iframe
+          src="https://www.youtube.com/embed/NmVU5NulA5A?si=dBWDe4n-Bi0Q7ADC"
+          title="Last Call (on the old me) — AI Music Video"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+          loading="lazy"
+          style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:4px;">
+        </iframe>
+      </div>
+      <p style="font-size:15px;font-weight:300;opacity:0.82;margin-bottom:18px;">AI-composed original music spanning country, rock, jazz, and pop — including a <strong style="color:var(--gold);">Suno contest winner</strong>. Exploring where machine learning meets genuine artistic voice. Also developing the <em>Lira</em> album as a human-AI collaboration.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a href="https://suno.com/playlist/8f7963c6-b967-4a59-8835-9accdd64325f" target="_blank" class="btn" style="font-size:10px;padding:10px 16px;background:rgba(240,192,64,0.1);color:var(--gold);border:1px solid rgba(240,192,64,0.3);">💿 Lira Album (In Dev)</a>
+      </div>
+    </div>
+    <div>
+      <ul class="song-list" id="songList">
+        <li class="song-item"><span class="song-name">Last Call (on the old me)</span>          <audio class="song-audio" src="music/last-call.mp3" preload="none"></audio><button class="song-play-btn" onclick="togglePlay(this)">▶</button></li>
+        <li class="song-item"><span class="song-name">The Bee's Knees &amp; the Cat's Pajamas</span> <audio class="song-audio" src="music/bees-knees.mp3" preload="none"></audio><button class="song-play-btn" onclick="togglePlay(this)">▶</button></li>
+        <li class="song-item"><span class="song-name">Cutting Through Me Like Lightning</span>     <audio class="song-audio" src="music/cutting-through.mp3" preload="none"></audio><button class="song-play-btn" onclick="togglePlay(this)">▶</button></li>
+        <li class="song-item"><span class="song-name">Rush Rush Rush</span>                        <audio class="song-audio" src="music/rush-rush-rush.mp3" preload="none"></audio><button class="song-play-btn" onclick="togglePlay(this)">▶</button></li>
+        <li class="song-item"><span class="song-name">Small Town</span>                            <audio class="song-audio" src="music/small-town.mp3" preload="none"></audio><button class="song-play-btn" onclick="togglePlay(this)">▶</button></li>
+        <li class="song-item"><span class="song-name">ChatGPT Just Gypped Me!</span>               <audio class="song-audio" src="music/chatgpt-gypped-me.mp3" preload="none"></audio><button class="song-play-btn" onclick="togglePlay(this)">▶</button></li>
+        <li class="song-item"><span class="song-name">Front Porch Swings (all doggone day)</span> <audio class="song-audio" src="music/front-porch-swings.mp3" preload="none"></audio><button class="song-play-btn" onclick="togglePlay(this)">▶</button></li>
+        <li class="song-item"><span class="song-name">Femme Fatale of the Feline World</span>      <audio class="song-audio" src="music/femme-fatale.mp3" preload="none"></audio><button class="song-play-btn" onclick="togglePlay(this)">▶</button></li>
+        <li class="song-item"><span class="song-name">Cast It All Away</span>                      <audio class="song-audio" src="music/cast-it-all-away.mp3" preload="none"></audio><button class="song-play-btn" onclick="togglePlay(this)">▶</button></li>
+      </ul>
+      <!-- progress bar -->
+      <div id="nowPlaying" style="display:none;margin-top:14px;background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:3px;padding:10px 14px;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--cyan);margin-bottom:6px;" id="nowPlayingTitle">Now Playing</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div id="progressBar" style="flex:1;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;cursor:pointer;" onclick="seekAudio(event,this)">
+            <div id="progressFill" style="height:100%;background:var(--cyan);border-radius:2px;width:0%;transition:width 0.3s;"></div>
+          </div>
+          <span id="timeDisplay" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);">0:00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<script>
+let currentAudio = null;
+let currentBtn = null;
+let progressInterval = null;
+
+function togglePlay(btn) {
+  const li = btn.closest('li');
+  const audio = li.querySelector('.song-audio');
+  const title = li.querySelector('.song-name').textContent;
+
+  if (currentAudio && currentAudio !== audio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    if (currentBtn) { currentBtn.textContent = '▶'; currentBtn.style.background = 'rgba(0,255,200,0.15)'; }
+    clearInterval(progressInterval);
+  }
+
+  if (audio.paused) {
+    audio.play();
+    btn.textContent = '⏸';
+    btn.style.background = 'rgba(0,255,200,0.35)';
+    currentAudio = audio;
+    currentBtn = btn;
+    document.getElementById('nowPlaying').style.display = 'block';
+    document.getElementById('nowPlayingTitle').textContent = '▶ ' + title;
+    progressInterval = setInterval(() => {
+      if (!audio.duration) return;
+      const pct = (audio.currentTime / audio.duration) * 100;
+      document.getElementById('progressFill').style.width = pct + '%';
+      const m = Math.floor(audio.currentTime/60);
+      const s = Math.floor(audio.currentTime%60).toString().padStart(2,'0');
+      document.getElementById('timeDisplay').textContent = m + ':' + s;
+    }, 300);
+    audio.onended = () => {
+      btn.textContent = '▶'; btn.style.background = 'rgba(0,255,200,0.15)';
+      document.getElementById('nowPlaying').style.display = 'none';
+      document.getElementById('progressFill').style.width = '0%';
+      clearInterval(progressInterval);
+    };
+  } else {
+    audio.pause();
+    btn.textContent = '▶';
+    btn.style.background = 'rgba(0,255,200,0.15)';
+    clearInterval(progressInterval);
+  }
+}
+
+function seekAudio(e, bar) {
+  if (!currentAudio || !currentAudio.duration) return;
+  const rect = bar.getBoundingClientRect();
+  const pct = (e.clientX - rect.left) / rect.width;
+  currentAudio.currentTime = pct * currentAudio.duration;
+}
+</script>
+<div class="divider"></div>
+
 <!-- ── MULTIMEDIA ── -->
 <section class="section-alt" id="multimedia">
 <div class="wrap">
@@ -767,112 +873,6 @@ h1{animation:none;}
 </div>
 </section>
 
-<div class="divider"></div>
-
-<!-- ── MUSIC ── -->
-<section class="section" id="music">
-<div class="wrap">
-  <div class="sec-label">// AI Creative</div>
-  <h2 class="sec-title">Suno AI Music</h2>
-  <div class="music-grid">
-    <div>
-      <div class="music-video-embed" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:4px;border:1px solid var(--border2);margin-bottom:18px;">
-        <iframe
-          src="https://www.youtube.com/embed/NmVU5NulA5A?si=dBWDe4n-Bi0Q7ADC"
-          title="Last Call (on the old me) — AI Music Video"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen
-          loading="lazy"
-          style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:4px;">
-        </iframe>
-      </div>
-      <p style="font-size:15px;font-weight:300;opacity:0.82;margin-bottom:18px;">AI-composed original music spanning country, rock, jazz, and pop — including a <strong style="color:var(--gold);">Suno contest winner</strong>. Exploring where machine learning meets genuine artistic voice. Also developing the <em>Lira</em> album as a human-AI collaboration.</p>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <a href="https://suno.com/playlist/8f7963c6-b967-4a59-8835-9accdd64325f" target="_blank" class="btn" style="font-size:10px;padding:10px 16px;background:rgba(240,192,64,0.1);color:var(--gold);border:1px solid rgba(240,192,64,0.3);">💿 Lira Album (In Dev)</a>
-      </div>
-    </div>
-    <div>
-      <ul class="song-list" id="songList">
-        <li class="song-item"><span class="song-name">Last Call (on the old me)</span>          <audio class="song-audio" src="music/last-call.mp3" preload="none"></audio><button class="song-play-btn" onclick="togglePlay(this)">▶</button></li>
-        <li class="song-item"><span class="song-name">The Bee's Knees &amp; the Cat's Pajamas</span> <audio class="song-audio" src="music/bees-knees.mp3" preload="none"></audio><button class="song-play-btn" onclick="togglePlay(this)">▶</button></li>
-        <li class="song-item"><span class="song-name">Cutting Through Me Like Lightning</span>     <audio class="song-audio" src="music/cutting-through.mp3" preload="none"></audio><button class="song-play-btn" onclick="togglePlay(this)">▶</button></li>
-        <li class="song-item"><span class="song-name">Rush Rush Rush</span>                        <audio class="song-audio" src="music/rush-rush-rush.mp3" preload="none"></audio><button class="song-play-btn" onclick="togglePlay(this)">▶</button></li>
-        <li class="song-item"><span class="song-name">Small Town</span>                            <audio class="song-audio" src="music/small-town.mp3" preload="none"></audio><button class="song-play-btn" onclick="togglePlay(this)">▶</button></li>
-        <li class="song-item"><span class="song-name">ChatGPT Just Gypped Me!</span>               <audio class="song-audio" src="music/chatgpt-gypped-me.mp3" preload="none"></audio><button class="song-play-btn" onclick="togglePlay(this)">▶</button></li>
-        <li class="song-item"><span class="song-name">Front Porch Swings (all doggone day)</span> <audio class="song-audio" src="music/front-porch-swings.mp3" preload="none"></audio><button class="song-play-btn" onclick="togglePlay(this)">▶</button></li>
-        <li class="song-item"><span class="song-name">Femme Fatale of the Feline World</span>      <audio class="song-audio" src="music/femme-fatale.mp3" preload="none"></audio><button class="song-play-btn" onclick="togglePlay(this)">▶</button></li>
-        <li class="song-item"><span class="song-name">Cast It All Away</span>                      <audio class="song-audio" src="music/cast-it-all-away.mp3" preload="none"></audio><button class="song-play-btn" onclick="togglePlay(this)">▶</button></li>
-      </ul>
-      <!-- progress bar -->
-      <div id="nowPlaying" style="display:none;margin-top:14px;background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:3px;padding:10px 14px;">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--cyan);margin-bottom:6px;" id="nowPlayingTitle">Now Playing</div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div id="progressBar" style="flex:1;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;cursor:pointer;" onclick="seekAudio(event,this)">
-            <div id="progressFill" style="height:100%;background:var(--cyan);border-radius:2px;width:0%;transition:width 0.3s;"></div>
-          </div>
-          <span id="timeDisplay" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);">0:00</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-</section>
-
-<script>
-let currentAudio = null;
-let currentBtn = null;
-let progressInterval = null;
-
-function togglePlay(btn) {
-  const li = btn.closest('li');
-  const audio = li.querySelector('.song-audio');
-  const title = li.querySelector('.song-name').textContent;
-
-  if (currentAudio && currentAudio !== audio) {
-    currentAudio.pause();
-    currentAudio.currentTime = 0;
-    if (currentBtn) { currentBtn.textContent = '▶'; currentBtn.style.background = 'rgba(0,255,200,0.15)'; }
-    clearInterval(progressInterval);
-  }
-
-  if (audio.paused) {
-    audio.play();
-    btn.textContent = '⏸';
-    btn.style.background = 'rgba(0,255,200,0.35)';
-    currentAudio = audio;
-    currentBtn = btn;
-    document.getElementById('nowPlaying').style.display = 'block';
-    document.getElementById('nowPlayingTitle').textContent = '▶ ' + title;
-    progressInterval = setInterval(() => {
-      if (!audio.duration) return;
-      const pct = (audio.currentTime / audio.duration) * 100;
-      document.getElementById('progressFill').style.width = pct + '%';
-      const m = Math.floor(audio.currentTime/60);
-      const s = Math.floor(audio.currentTime%60).toString().padStart(2,'0');
-      document.getElementById('timeDisplay').textContent = m + ':' + s;
-    }, 300);
-    audio.onended = () => {
-      btn.textContent = '▶'; btn.style.background = 'rgba(0,255,200,0.15)';
-      document.getElementById('nowPlaying').style.display = 'none';
-      document.getElementById('progressFill').style.width = '0%';
-      clearInterval(progressInterval);
-    };
-  } else {
-    audio.pause();
-    btn.textContent = '▶';
-    btn.style.background = 'rgba(0,255,200,0.15)';
-    clearInterval(progressInterval);
-  }
-}
-
-function seekAudio(e, bar) {
-  if (!currentAudio || !currentAudio.duration) return;
-  const rect = bar.getBoundingClientRect();
-  const pct = (e.clientX - rect.left) / rect.width;
-  currentAudio.currentTime = pct * currentAudio.duration;
-}
-</script>
 
 <div class="divider"></div>
 

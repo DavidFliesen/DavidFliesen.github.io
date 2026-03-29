@@ -450,13 +450,19 @@ h1{animation:none;}
   .card-wide{grid-template-columns:1fr;}
   .nav-links{display:none;}
   .nav-cta{display:none;}
+  /* ISTE: stack image below text on mobile */
+  .card-wide[style*="grid-template-columns:1fr 220px"]{grid-template-columns:1fr !important;}
+  /* Legacy AI roots: stack on mobile */
+  div[style*="grid-template-columns:200px 1fr"]{grid-template-columns:1fr !important;}
 }
 /* ── LIGHTBOX ── */
 .lb-overlay{
-  display:none;position:fixed;inset:0;z-index:999;
+  display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:999;
   background:rgba(0,0,0,0.92);
   align-items:center;justify-content:center;
   cursor:zoom-out;
+  -webkit-overflow-scrolling:touch;
+  touch-action:none;
 }
 .lb-overlay.open{display:flex;}
 .lb-overlay img{
@@ -632,17 +638,10 @@ h1{animation:none;}
   <h2 class="sec-title">Suno AI Music</h2>
   <div class="music-grid">
     <div>
-      <div class="music-video-embed" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:4px;border:1px solid var(--border2);margin-bottom:18px;">
-        <iframe
-          src="https://www.youtube.com/embed/NmVU5NulA5A?si=dBWDe4n-Bi0Q7ADC"
-          title="Last Call (on the old me) — AI Music Video"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen
-          loading="lazy"
-          style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:4px;">
-        </iframe>
-      </div>
+      <a href="https://youtu.be/NmVU5NulA5A" target="_blank" class="music-video-thumb" style="margin-bottom:18px;">
+        <img src="https://img.youtube.com/vi/NmVU5NulA5A/mqdefault.jpg" alt="Last Call (on the old me) — AI Music Video" loading="lazy">
+        <div class="music-play"><div class="music-play-btn">▶</div></div>
+      </a>
       <p style="font-size:15px;font-weight:300;opacity:0.82;margin-bottom:18px;">AI-composed original music spanning country, rock, jazz, and pop — including a <strong style="color:var(--gold);">Suno contest winner</strong>. Exploring where machine learning meets genuine artistic voice. Also developing the <em>Lira</em> album as a human-AI collaboration.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <a href="https://suno.com/playlist/8f7963c6-b967-4a59-8835-9accdd64325f" target="_blank" class="btn" style="font-size:10px;padding:10px 16px;background:rgba(240,192,64,0.1);color:var(--gold);border:1px solid rgba(240,192,64,0.3);">💿 Lira Album (In Dev)</a>
@@ -788,8 +787,8 @@ function seekAudio(e, bar) {
 
     <!-- Creatures of Magic -->
     <div class="card">
-      <div class="card-thumb" onclick="openLightbox('https://character-animator.weebly.com/uploads/1/9/4/6/19465365/3392644_orig.png','Creatures of Magic — Storyboard')" style="cursor:zoom-in;">
-        <img src="https://character-animator.weebly.com/uploads/1/9/4/6/19465365/3392644_orig.png" alt="Creatures of Magic storyboard" loading="lazy">
+      <div class="card-thumb" onclick="openLightbox('images/creatures-of-magic.png','Creatures of Magic — Storyboard')" style="cursor:zoom-in;">
+        <img src="images/creatures-of-magic.png" alt="Creatures of Magic storyboard" onerror="this.onerror=null;this.style.background='rgba(255,255,255,0.04)';this.style.padding='40px';this.style.opacity='0.3';this.alt=this.alt||'';" loading="lazy">
         <div class="play-overlay"><div class="view-btn">View Full ↗</div></div>
       </div>
       <span class="card-badge badge-media">Storyboarding</span>
@@ -800,8 +799,8 @@ function seekAudio(e, bar) {
 
     <!-- WTC Hub -->
     <div class="card">
-      <div class="card-thumb" onclick="openLightbox('https://character-animator.weebly.com/uploads/1/9/4/6/19465365/7780125.jpg','World Trade Center Port Authority Transportation Hub — 3D Model')" style="cursor:zoom-in;">
-        <img src="https://character-animator.weebly.com/uploads/1/9/4/6/19465365/7780125.jpg" alt="World Trade Center Port Authority Hub 3D" loading="lazy">
+      <div class="card-thumb" onclick="openLightbox('images/wtc-hub.jpg','World Trade Center Port Authority Transportation Hub — 3D Model')" style="cursor:zoom-in;">
+        <img src="images/wtc-hub.jpg" alt="World Trade Center Port Authority Hub 3D" onerror="this.onerror=null;this.style.background='rgba(255,255,255,0.04)';this.style.padding='40px';this.style.opacity='0.3';this.alt=this.alt||'';" loading="lazy">
         <div class="play-overlay"><div class="view-btn">View Full ↗</div></div>
       </div>
       <span class="card-badge badge-media">3D Modeling</span>
@@ -812,8 +811,8 @@ function seekAudio(e, bar) {
 
     <!-- SimWars -->
     <div class="card">
-      <div class="card-thumb" onclick="openLightbox('https://character-animator.weebly.com/uploads/1/9/4/6/19465365/1985509_orig.jpg','SimWars — USN Naval Simulation Game Design')" style="cursor:zoom-in;">
-        <img src="https://character-animator.weebly.com/uploads/1/9/4/6/19465365/1985509_orig.jpg" alt="SimWars USN Game" loading="lazy">
+      <div class="card-thumb" onclick="openLightbox('images/simwars.jpg','SimWars — USN Naval Simulation Game Design')" style="cursor:zoom-in;">
+        <img src="images/simwars.jpg" alt="SimWars USN Game" onerror="this.onerror=null;this.style.background='rgba(255,255,255,0.04)';this.style.padding='40px';this.style.opacity='0.3';this.alt=this.alt||'';" loading="lazy">
         <div class="play-overlay"><div class="view-btn">View Full ↗</div></div>
       </div>
       <span class="card-badge badge-legacy">USN · Game Design</span>
@@ -824,8 +823,8 @@ function seekAudio(e, bar) {
 
     <!-- MEDATAR -->
     <div class="card">
-      <div class="card-thumb" onclick="openLightbox('https://character-animator.weebly.com/uploads/1/9/4/6/19465365/3994161_orig.png','MEDATAR — USAF Medical Training Serious Game')" style="cursor:zoom-in;">
-        <img src="https://character-animator.weebly.com/uploads/1/9/4/6/19465365/3994161_orig.png" alt="MEDATAR USAF serious game" loading="lazy">
+      <div class="card-thumb" onclick="openLightbox('images/medatar.png','MEDATAR — USAF Medical Training Serious Game')" style="cursor:zoom-in;">
+        <img src="images/medatar.png" alt="MEDATAR USAF serious game" onerror="this.onerror=null;this.style.background='rgba(255,255,255,0.04)';this.style.padding='40px';this.style.opacity='0.3';this.alt=this.alt||'';" loading="lazy">
         <div class="play-overlay"><div class="view-btn">View Full ↗</div></div>
       </div>
       <span class="card-badge badge-legacy">USAF · Serious Game</span>
@@ -884,7 +883,7 @@ function seekAudio(e, bar) {
   <div style="display:grid;grid-template-columns:200px 1fr;gap:40px;align-items:start;margin-bottom:36px;">
     <div>
       <div style="border:1px solid rgba(176,144,255,0.3);border-radius:4px;overflow:hidden;background:var(--card);">
-        <img src="https://character-animator.weebly.com/uploads/1/9/4/6/19465365/462804610.jpg" alt="Sun Tzu virtual agent" loading="lazy" style="width:100%;display:block;filter:brightness(0.85) saturate(0.8);">
+        <img src="images/sun-tzu-avatar.jpg" alt="Sun Tzu virtual agent" onerror="this.onerror=null;this.style.background='rgba(255,255,255,0.04)';this.style.padding='40px';this.style.opacity='0.3';this.alt=this.alt||'';" loading="lazy" style="width:100%;display:block;filter:brightness(0.85) saturate(0.8);">
       </div>
       <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.1em;color:var(--purple);text-align:center;margin-top:8px;text-transform:uppercase;">Sun Tzu · Second Life Avatar</div>
     </div>
@@ -974,18 +973,23 @@ function closeLightbox() {
   document.body.style.overflow = '';
 }
 
-// Close on ✕ button
-document.getElementById('lb-close-btn').addEventListener('click', function(e) {
-  e.stopPropagation();
-  closeLightbox();
+// Close on ✕ button (click + touchend for iOS)
+['click','touchend'].forEach(function(evt) {
+  document.getElementById('lb-close-btn').addEventListener(evt, function(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    closeLightbox();
+  });
 });
 
-// Close on backdrop click (but not on the image itself)
-document.getElementById('lightbox').addEventListener('click', function(e) {
-  if (e.target === this || e.target === document.getElementById('lb-caption')) {
+// Close on backdrop click or touch (but not on the image itself)
+function backdropClose(e) {
+  if (e.target === document.getElementById('lightbox') || e.target === document.getElementById('lb-caption')) {
     closeLightbox();
   }
-});
+}
+document.getElementById('lightbox').addEventListener('click', backdropClose);
+document.getElementById('lightbox').addEventListener('touchend', backdropClose);
 
 // Close on Escape
 document.addEventListener('keydown', function(e) {

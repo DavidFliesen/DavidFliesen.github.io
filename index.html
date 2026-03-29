@@ -738,8 +738,10 @@ h1{animation:none;}
       <p>Developed a virtual story-based quest for the International Society for Technology in Education 2017 Conference using the Unity game engine. Players cultivate the last echrina plant while encountering characters — an evil ladybug, a riddle-spinning sporty granny — in a narrative emphasizing teamwork and environmental education. A masterclass in educational storytelling through game mechanics.</p>
       <a href="https://www.slideshare.net/slideshow/iste-2017-space-nature-quest/77040319" target="_blank" class="slide-link">View Slide Deck</a>
     </div>
-    <div class="card-wide-img" onclick="openLightbox('images/nature-quest-thumbnail.png','ISTE 2017: Space Nature Quest')" style="cursor:zoom-in;align-self:center;">
-      <img src="images/nature-quest-thumbnail.png" alt="ISTE 2017 Space Nature Quest" loading="lazy" style="height:160px;object-fit:cover;width:100%;">
+    <div class="card-wide-img" style="align-self:center;">
+      <a href="https://www.slideshare.net/slideshow/iste-2017-space-nature-quest/77040319" target="_blank">
+        <img src="images/nature-quest-thumbnail.png" alt="ISTE 2017 Space Nature Quest" loading="lazy" style="height:160px;object-fit:cover;width:100%;display:block;">
+      </a>
     </div>
   </div>
 
@@ -952,8 +954,8 @@ function seekAudio(e, bar) {
 </footer>
 
 <!-- ── LIGHTBOX ── -->
-<div class="lb-overlay" id="lightbox" onclick="closeLightbox(event)">
-  <button class="lb-close" onclick="document.getElementById('lightbox').classList.remove('open')">✕</button>
+<div class="lb-overlay" id="lightbox">
+  <button class="lb-close" id="lb-close-btn">✕</button>
   <img id="lb-img" src="" alt="">
   <div class="lb-caption" id="lb-caption"></div>
 </div>
@@ -965,17 +967,29 @@ function openLightbox(src, caption) {
   document.getElementById('lightbox').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-function closeLightbox(e) {
-  if (e.target === document.getElementById('lightbox')) {
-    document.getElementById('lightbox').classList.remove('open');
-    document.body.style.overflow = '';
-  }
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.getElementById('lb-img').src = '';
+  document.body.style.overflow = '';
 }
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    document.getElementById('lightbox').classList.remove('open');
-    document.body.style.overflow = '';
+
+// Close on ✕ button
+document.getElementById('lb-close-btn').addEventListener('click', function(e) {
+  e.stopPropagation();
+  closeLightbox();
+});
+
+// Close on backdrop click (but not on the image itself)
+document.getElementById('lightbox').addEventListener('click', function(e) {
+  if (e.target === this || e.target === document.getElementById('lb-caption')) {
+    closeLightbox();
   }
+});
+
+// Close on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeLightbox();
 });
 </script>
 

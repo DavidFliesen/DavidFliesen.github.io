@@ -1748,6 +1748,8 @@ function seekAudio(e, bar) {
     th.addEventListener('touchend', function(e){ e.preventDefault(); goTo(i); if(!paused) resetTimer(); });
   });
 
+  var initialized = false;
+
   function goTo(n){
     slides[current].classList.remove('active');
     thumbs[current].classList.remove('active');
@@ -1755,7 +1757,9 @@ function seekAudio(e, bar) {
     slides[current].classList.add('active');
     thumbs[current].classList.add('active');
     counter.textContent = (current+1) + ' / ' + slides.length;
-    thumbs[current].scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+    if(initialized){
+      thumbs[current].scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+    }
   }
 
   window.moveSlide = function(dir){
@@ -1786,6 +1790,7 @@ function seekAudio(e, bar) {
   });
 
   goTo(0);
+  initialized = true;
   resetTimer();
 })();
 </script>

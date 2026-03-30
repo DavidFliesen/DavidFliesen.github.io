@@ -496,8 +496,8 @@ h1{animation:none;}
 }
 .slide.active{display:block;opacity:1;}
 .slide img{
-  width:100%;height:100%;object-fit:cover;
-  filter:brightness(0.88) saturate(0.9);
+  width:100%;height:100%;object-fit:contain;
+  filter:brightness(0.92) saturate(0.9);
   display:block;
 }
 .slide-caption{
@@ -512,7 +512,7 @@ h1{animation:none;}
   font-size:9px;font-style:normal;letter-spacing:0.18em;
   color:var(--gold);text-transform:uppercase;margin-bottom:4px;
 }
-.slide-prev,.slide-next{
+.slide-prev,.slide-next,.slide-pause{
   position:absolute;top:50%;transform:translateY(-50%);
   background:rgba(0,0,0,0.5);border:1px solid rgba(0,255,200,0.3);
   color:var(--cyan);font-size:18px;width:40px;height:40px;
@@ -522,7 +522,13 @@ h1{animation:none;}
 }
 .slide-prev{left:12px;}
 .slide-next{right:12px;}
-.slide-prev:hover,.slide-next:hover{background:rgba(0,255,200,0.15);}
+.slide-pause{
+  position:absolute;top:12px;right:12px;
+  top:auto;bottom:12px;
+  width:32px;height:32px;font-size:13px;
+  transform:none;
+}
+.slide-prev:hover,.slide-next:hover,.slide-pause:hover{background:rgba(0,255,200,0.15);}
 .slide-dots{
   display:flex;justify-content:center;gap:8px;margin-top:14px;
 }
@@ -1461,6 +1467,7 @@ function seekAudio(e, bar) {
 
     <button class="slide-prev" onclick="moveSlide(-1)" aria-label="Previous">‹</button>
     <button class="slide-next" onclick="moveSlide(1)" aria-label="Next">›</button>
+    <button class="slide-pause" id="slidePauseBtn" aria-label="Pause">⏸</button>
   </div>
 
   <div class="slide-thumbs" id="slideThumbs">
@@ -1727,16 +1734,18 @@ function seekAudio(e, bar) {
 
 <script>
 (function(){
-  var slides = document.querySelectorAll('#photoSlideshow .slide');
-  var thumbs  = document.querySelectorAll('#slideThumbs .slide-thumb');
-  var counter = document.getElementById('slideCounter');
-  var current = 0;
+  var slides   = document.querySelectorAll('#photoSlideshow .slide');
+  var thumbs   = document.querySelectorAll('#slideThumbs .slide-thumb');
+  var counter  = document.getElementById('slideCounter');
+  var pauseBtn = document.getElementById('slidePauseBtn');
+  var current  = 0;
   var timer;
+  var paused   = false;
 
-  // Click handlers on thumbs
+  // Thumb click handlers
   thumbs.forEach(function(th, i){
-    th.addEventListener('click', function(){ goTo(i); resetTimer(); });
-    th.addEventListener('touchend', function(e){ e.preventDefault(); goTo(i); resetTimer(); });
+    th.addEventListener('click',    function(){ goTo(i); if(!paused) resetTimer(); });
+    th.addEventListener('touchend', function(e){ e.preventDefault(); goTo(i); if(!paused) resetTimer(); });
   });
 
   function goTo(n){
@@ -1746,16 +1755,35 @@ function seekAudio(e, bar) {
     slides[current].classList.add('active');
     thumbs[current].classList.add('active');
     counter.textContent = (current+1) + ' / ' + slides.length;
-    // scroll active thumb into view
     thumbs[current].scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
   }
 
-  window.moveSlide = function(dir){ goTo(current+dir); resetTimer(); };
+  window.moveSlide = function(dir){
+    goTo(current + dir);
+    if(!paused) resetTimer();
+  };
 
   function resetTimer(){
     clearInterval(timer);
     timer = setInterval(function(){ goTo(current+1); }, 5000);
   }
+
+  function togglePause(){
+    paused = !paused;
+    if(paused){
+      clearInterval(timer);
+      pauseBtn.textContent = '▶';
+      pauseBtn.setAttribute('aria-label','Play');
+    } else {
+      resetTimer();
+      pauseBtn.textContent = '⏸';
+      pauseBtn.setAttribute('aria-label','Pause');
+    }
+  }
+
+  ['click','touchend'].forEach(function(evt){
+    pauseBtn.addEventListener(evt, function(e){ e.preventDefault(); togglePause(); });
+  });
 
   goTo(0);
   resetTimer();

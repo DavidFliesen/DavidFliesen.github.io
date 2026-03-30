@@ -546,7 +546,41 @@ h1{animation:none;}
   font-family:'JetBrains Mono',monospace;font-size:10px;
   letter-spacing:0.12em;text-align:center;padding:20px;gap:10px;
 }
-.slide-placeholder svg{opacity:0.3;}</style>
+.slide-placeholder svg{opacity:0.3;}
+/* ── SLIDESHOW THUMBNAILS ── */
+.slide-thumbs{
+  display:flex;gap:6px;margin-top:10px;
+  overflow-x:auto;padding-bottom:6px;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(0,255,200,0.3) transparent;
+}
+.slide-thumbs::-webkit-scrollbar{height:4px;}
+.slide-thumbs::-webkit-scrollbar-track{background:transparent;}
+.slide-thumbs::-webkit-scrollbar-thumb{background:rgba(0,255,200,0.25);border-radius:2px;}
+.slide-thumb{
+  flex-shrink:0;width:80px;height:56px;
+  border-radius:3px;overflow:hidden;cursor:pointer;
+  border:2px solid transparent;
+  transition:border-color 0.2s,opacity 0.2s;
+  opacity:0.5;
+  -webkit-tap-highlight-color:transparent;
+}
+.slide-thumb img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  filter:brightness(0.8);transition:filter 0.2s;
+}
+.slide-thumb.active{
+  border-color:var(--cyan);opacity:1;
+}
+.slide-thumb.active img,.slide-thumb:hover img{filter:brightness(1);}
+.slide-thumb:hover{opacity:0.85;}
+/* placeholder thumb */
+.slide-thumb-ph{
+  width:100%;height:100%;
+  background:rgba(255,255,255,0.04);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--muted);font-size:18px;
+}</style>
 </head>
 <body>
 
@@ -1016,7 +1050,33 @@ function seekAudio(e, bar) {
     <button class="slide-next" onclick="moveSlide(1)" aria-label="Next">›</button>
   </div>
 
-  <div class="slide-dots" id="slideDots"></div>
+  <div class="slide-thumbs" id="slideThumbs">
+    <div class="slide-thumb active">
+      <img src="images/slideshow/photo-01.jpg" alt="1"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="slide-thumb-ph" style="display:none;">📷</div>
+    </div>
+    <div class="slide-thumb">
+      <img src="images/slideshow/photo-02.jpg" alt="2"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="slide-thumb-ph" style="display:none;">📷</div>
+    </div>
+    <div class="slide-thumb">
+      <img src="images/slideshow/photo-03.jpg" alt="3"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="slide-thumb-ph" style="display:none;">📷</div>
+    </div>
+    <div class="slide-thumb">
+      <img src="images/slideshow/photo-04.jpg" alt="4"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="slide-thumb-ph" style="display:none;">📷</div>
+    </div>
+    <div class="slide-thumb">
+      <img src="images/slideshow/photo-05.jpg" alt="5"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="slide-thumb-ph" style="display:none;">📷</div>
+    </div>
+  </div>
   <div class="slide-counter" id="slideCounter"></div>
 
 </div>
@@ -1025,26 +1085,26 @@ function seekAudio(e, bar) {
 <script>
 (function(){
   var slides = document.querySelectorAll('#photoSlideshow .slide');
-  var dotsContainer = document.getElementById('slideDots');
+  var thumbs  = document.querySelectorAll('#slideThumbs .slide-thumb');
   var counter = document.getElementById('slideCounter');
   var current = 0;
   var timer;
 
-  // Build dots
-  slides.forEach(function(_, i){
-    var d = document.createElement('div');
-    d.className = 'slide-dot' + (i===0?' active':'');
-    d.addEventListener('click', function(){ goTo(i); resetTimer(); });
-    dotsContainer.appendChild(d);
+  // Click handlers on thumbs
+  thumbs.forEach(function(th, i){
+    th.addEventListener('click', function(){ goTo(i); resetTimer(); });
+    th.addEventListener('touchend', function(e){ e.preventDefault(); goTo(i); resetTimer(); });
   });
 
   function goTo(n){
     slides[current].classList.remove('active');
-    dotsContainer.children[current].classList.remove('active');
+    thumbs[current].classList.remove('active');
     current = (n + slides.length) % slides.length;
     slides[current].classList.add('active');
-    dotsContainer.children[current].classList.add('active');
+    thumbs[current].classList.add('active');
     counter.textContent = (current+1) + ' / ' + slides.length;
+    // scroll active thumb into view
+    thumbs[current].scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
   }
 
   window.moveSlide = function(dir){ goTo(current+dir); resetTimer(); };

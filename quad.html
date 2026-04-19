@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>QUAD // Command Center</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap');
+
+:root {
+  --bg: #080a0e;
+  --panel: #0d1117;
+  --border: #1e2530;
+  --accent: #00d4ff;
+  --accent2: #ff6b35;
+  --accent3: #a8ff3e;
+  --accent4: #c084fc;
+  --text: #e8edf5;
+  --muted: #4a5568;
+  --glow: 0 0 20px rgba(0,212,255,0.3);
+  --gap: 6px;
+  --bar: 46px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { width:100%; height:100%; background:var(--bg); color:var(--text); font-family:'JetBrains Mono',monospace; overflow:hidden; }
+
+/* ══ TOPBAR ══ */
+#topbar {
+  height:var(--bar);
+  background:var(--panel);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center;
+  padding:0 14px; gap:8px;
+  z-index:200;
+  position:relative;
+}
+
+#logo {
+  font-family:'Syne',sans-serif; font-weight:800; font-size:16px;
+  letter-spacing:.15em; color:var(--accent); text-shadow:var(--glow);
+  display:flex; align-items:center; gap:7px; flex-shrink:0;
+}
+#logo span { color:var(--muted); font-weight:400; font-size:10px; letter-spacing:.06em; }
+
+.dot-live {
+  width:7px; height:7px; background:var(--accent3); border-radius:50%;
+  animation:pulse 1.8s ease-in-out infinite; box-shadow:0 0 8px var(--accent3);
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+
+.sep { width:1px; height:22px; background:var(--border); flex-shrink:0; }
+
+/* layout icons */
+#layout-bar { display:flex; gap:3px; }
+.li {
+  width:24px; height:17px; border-radius:2px; cursor:pointer;
+  display:grid; gap:1.5px; padding:3px;
+  border:1px solid var(--muted); opacity:.5; transition:all .15s;
+}
+.li:hover,.li.on { border-color:var(--accent); opacity:1; }
+.li .s { background:var(--muted); border-radius:1px; }
+.li.on .s { background:var(--accent); }
+.li-quad { grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; }
+.li-pip  { grid-template-columns:2fr 1fr; grid-template-rows:1fr 1fr; }
+.li-pip .s:first-child { grid-row:1/3; }
+.li-full { grid-template-columns:1fr; grid-template-rows:1fr; }
+
+/* top buttons */
+.tb {
+  background:var(--border); border:1px solid var(--muted); color:var(--text);
+  font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.06em;
+  padding:4px 9px; border-radius:3px; cursor:pointer; white-space:nowrap; transition:all .15s;
+}
+.tb:hover { border-color:var(--accent); color:var(--accent); }
+.tb.red:hover { border-color:var(--accent2); color:var(--accent2); }
+
+/* mode toggle hint */
+#tip {
+  margin-left:auto;
+  font-size:9px; color:var(--muted); letter-spacing:.06em;
+  white-space:nowrap;
+}
+
+/* ══ GRID ══ */
+#grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-template-rows:1fr 1fr;
+  gap:var(--gap); padding:var(--gap);
+  width:100%; height:calc(100vh - var(--bar));
+}
+#grid.l-pip { grid-template-columns:3fr 1fr; }
+#grid.l-pip .cell:first-child { grid-row:1/3; }
+#grid.l-full .cell { display:none; }
+#grid.l-full .cell.focused { display:flex; grid-column:1/3; grid-row:1/3; }
+
+/* ══ CELL ══ */
+.cell {
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:6px; overflow:hidden;
+  display:flex; flex-direction:column;
+  position:relative; transition:border-color .2s,box-shadow .2s;
+  min-width:0; min-height:0;
+}
+.cell.focused { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent),var(--glow); }
+
+/* mode stripe */
+.cell::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px; z-index:5;
+  background:var(--muted); transition:background .2s;
+}
+.cell.mode-yt::before   { background:var(--accent2); }
+.cell.mode-web::before  { background:var(--accent); }
+
+/* ── HEADER ── */
+.cell-hdr {
+  height:32px; min-height:32px;
+  background:rgba(13,17,23,.97);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center;
+  padding:0 7px; gap:5px; z-index:10;
+  margin-top:2px;
+}
+
+/* mode toggle pill */
+.mode-pill {
+  display:flex; border-radius:3px; overflow:hidden;
+  border:1px solid var(--border); flex-shrink:0;
+}
+.mp-btn {
+  background:transparent; border:none; color:var(--muted);
+  font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.05em;
+  padding:2px 6px; cursor:pointer; transition:all .15s; white-space:nowrap;
+}
+.mp-btn.on { background:var(--accent2); color:#000; }
+.mp-btn.on.web { background:var(--accent); color:var(--bg); }
+
+.ch-num { font-size:9px; color:var(--muted); letter-spacing:.08em; flex-shrink:0; }
+
+.url-field {
+  flex:1; background:rgba(255,255,255,.04); border:1px solid var(--border);
+  outline:none; color:var(--text); font-family:'JetBrains Mono',monospace;
+  font-size:10px; padding:3px 6px; border-radius:3px; transition:border-color .15s;
+  min-width:0;
+}
+.url-field:focus { border-color:var(--accent); }
+.url-field::placeholder { color:var(--muted); }
+
+.go-btn {
+  background:var(--accent); border:none; color:var(--bg);
+  font-family:'JetBrains Mono',monospace; font-size:9px; font-weight:500;
+  padding:3px 8px; border-radius:3px; cursor:pointer; flex-shrink:0; transition:opacity .15s;
+}
+.go-btn:hover { opacity:.8; }
+
+.hdr-actions { display:flex; gap:3px; flex-shrink:0; }
+.ic {
+  background:transparent; border:1px solid var(--border); color:var(--muted);
+  font-size:11px; width:22px; height:22px; border-radius:3px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; transition:all .15s; flex-shrink:0;
+}
+.ic:hover { border-color:var(--accent); color:var(--accent); }
+.ic.muted { border-color:var(--accent2); color:var(--accent2); }
+
+/* ── BODY ── */
+.cell-body { flex:1; position:relative; overflow:hidden; background:#000; }
+
+/* YouTube player target */
+.yt-target { position:absolute; inset:0; width:100%; height:100%; }
+
+/* web iframe */
+.web-frame {
+  position:absolute; inset:0; width:100%; height:100%; border:none; display:none;
+  background:#fff;
+}
+.web-frame.show { display:block; }
+
+/* spinner */
+.spinner {
+  position:absolute; inset:0; display:none;
+  align-items:center; justify-content:center;
+  background:var(--panel); z-index:8;
+}
+.spinner.show { display:flex; }
+.spin-ring {
+  width:28px; height:28px; border:2px solid var(--border);
+  border-top-color:var(--accent); border-radius:50%;
+  animation:spin .75s linear infinite;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+
+/* empty / drop zone */
+.drop-zone {
+  position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:10px;
+  background:var(--panel); z-index:5; cursor:pointer;
+}
+.drop-zone.gone { display:none; }
+.dz-num {
+  font-family:'Syne',sans-serif; font-weight:800; font-size:56px;
+  line-height:1; opacity:.05; color:var(--accent); pointer-events:none;
+}
+.dz-hint { font-size:9px; color:var(--muted); letter-spacing:.07em; text-align:center; line-height:1.8; }
+
+.qp-row { display:flex; flex-wrap:wrap; gap:4px; justify-content:center; padding:0 14px; max-width:320px; }
+.qp {
+  background:var(--border); border:1px solid var(--muted); color:var(--text);
+  font-family:'JetBrains Mono',monospace; font-size:9px; padding:3px 7px;
+  border-radius:3px; cursor:pointer; white-space:nowrap; transition:all .15s;
+}
+.qp:hover { border-color:var(--accent3); color:var(--accent3); }
+.qp.yt:hover  { border-color:var(--accent2); color:var(--accent2); }
+
+/* error */
+.err-overlay {
+  position:absolute; inset:0; display:none; flex-direction:column;
+  align-items:center; justify-content:center; gap:8px;
+  background:var(--panel); z-index:9; padding:20px; text-align:center;
+}
+.err-overlay.show { display:flex; }
+.err-icon { font-size:26px; opacity:.35; }
+.err-title { font-size:11px; color:var(--text); letter-spacing:.05em; }
+.err-sub { font-size:9px; color:var(--muted); line-height:1.8; max-width:260px; }
+.err-open {
+  background:var(--accent2); border:none; color:#fff;
+  font-family:'JetBrains Mono',monospace; font-size:9px; font-weight:500;
+  padding:5px 12px; border-radius:3px; cursor:pointer; margin-top:4px;
+}
+.err-open:hover { opacity:.85; }
+
+/* hover overlay */
+.cell-ov {
+  position:absolute; bottom:6px; right:6px;
+  display:flex; gap:4px; opacity:0; transition:opacity .2s; z-index:20;
+}
+.cell:hover .cell-ov { opacity:1; }
+.ov-b {
+  background:rgba(8,10,14,.88); border:1px solid var(--muted); color:var(--text);
+  font-family:'JetBrains Mono',monospace; font-size:9px; padding:4px 8px;
+  border-radius:3px; cursor:pointer; backdrop-filter:blur(4px); transition:all .15s;
+}
+.ov-b:hover { border-color:var(--accent); color:var(--accent); }
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div id="logo">
+    <div class="dot-live"></div>
+    QUAD <span>// COMMAND CENTER</span>
+  </div>
+  <div class="sep"></div>
+  <div id="layout-bar">
+    <div class="li li-quad on" title="2×2" onclick="setLayout('quad',this)">
+      <div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div>
+    </div>
+    <div class="li li-pip" title="Focus+side" onclick="setLayout('pip',this)">
+      <div class="s"></div><div class="s"></div><div class="s"></div>
+    </div>
+    <div class="li li-full" title="Solo" onclick="setLayout('full',this)">
+      <div class="s"></div>
+    </div>
+  </div>
+  <div class="sep"></div>
+  <button class="tb" onclick="pauseAll()">⏸ ALL</button>
+  <button class="tb" onclick="playAll()">▶ ALL</button>
+  <button class="tb" onclick="reloadAll()">↺ ALL</button>
+  <button class="tb red" onclick="clearAll()">✕ CLEAR</button>
+  <div id="tip">YT or WEB per pane  ·  paste any URL</div>
+</div>
+
+<div id="grid"></div>
+
+<script>
+// ══ CONFIG ══
+const YT_PICKS = [
+  {label:'Lofi ♪',    id:'jfKfPfyJRdk'},
+  {label:'ISS Earth', id:'86YLFOog4GM'},
+  {label:'Deep Ocean',id:'BHACKCNDMW8'},
+  {label:'Jazz',      id:'NEuZxGSl8DQ'},
+  {label:'4K Nature', id:'LXb3EKWsInQ'},
+  {label:'NASA TV',   id:'nA9UZF-SZoQ'},
+];
+const WEB_PICKS = [
+  {label:'Wikipedia', url:'https://en.wikipedia.org'},
+  {label:'HN',        url:'https://news.ycombinator.com'},
+  {label:'NASA',      url:'https://www.nasa.gov'},
+  {label:'BBC',       url:'https://www.bbc.com/news'},
+];
+
+const CELLS = 4;
+let players   = new Array(CELLS).fill(null);
+let ytReady   = false;
+let pending   = {};
+let layout    = 'quad';
+
+let S = Array.from({length:CELLS}, (_,i) => ({
+  mode: 'yt',   // 'yt' | 'web'
+  videoId: '',
+  webUrl:  '',
+  muted:   false,
+  focused: i===0,
+  errUrl:  '',
+}));
+
+// ══ EXTRACT ══
+function extractVideoId(s) {
+  s = s.trim();
+  let m;
+  m = s.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);          if(m) return m[1];
+  m = s.match(/[?&]v=([a-zA-Z0-9_-]{11})/);               if(m) return m[1];
+  m = s.match(/\/embed\/([a-zA-Z0-9_-]{11})/);            if(m) return m[1];
+  m = s.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);           if(m) return m[1];
+  if(/^[a-zA-Z0-9_-]{11}$/.test(s)) return s;
+  return null;
+}
+
+function normalizeWebUrl(s) {
+  s = s.trim();
+  if(!s) return '';
+  if(/^https?:\/\//i.test(s)) return s;
+  if(/^[\w-]+\.[a-z]{2,}/i.test(s)) return 'https://'+s;
+  return 'https://www.google.com/search?q='+encodeURIComponent(s);
+}
+
+// ══ BUILD ══
+function buildGrid() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  for(let i=0;i<CELLS;i++) {
+    const c = document.createElement('div');
+    c.id    = `cell-${i}`;
+    c.className = `cell mode-${S[i].mode}` + (S[i].focused?' focused':'');
+    c.dataset.i = i;
+    c.innerHTML = cellHTML(i);
+    grid.appendChild(c);
+  }
+}
+
+function cellHTML(i) {
+  const ytOn  = S[i].mode==='yt'  ? ' on'  : '';
+  const webOn = S[i].mode==='web' ? ' on web' : '';
+  const ph    = S[i].mode==='yt'
+    ? 'YouTube URL, youtu.be/… or video ID'
+    : 'Website URL or search term…';
+  const val   = S[i].mode==='yt' ? (S[i].videoId ? `https://youtu.be/${S[i].videoId}` : '')
+                                  : (S[i].webUrl  || '');
+
+  const ytQP  = YT_PICKS.map(q=>`<button class="qp yt" onclick="event.stopPropagation();loadYT(${i},'${q.id}','${q.label}')">${q.label}</button>`).join('');
+  const webQP = WEB_PICKS.map(q=>`<button class="qp" onclick="event.stopPropagation();loadWeb(${i},'${q.url}')">${q.label}</button>`).join('');
+
+  return `
+    <div class="cell-hdr" onclick="event.stopPropagation()">
+      <div class="mode-pill">
+        <button class="mp-btn${ytOn}"  id="mpyt-${i}"  onclick="setMode(${i},'yt')">YT</button>
+        <button class="mp-btn${webOn}" id="mpweb-${i}" onclick="setMode(${i},'web')">WEB</button>
+      </div>
+      <span class="ch-num">CH${i+1}</span>
+      <input class="url-field" id="url-${i}" type="url" inputmode="url"
+        placeholder="${ph}" value="${val}"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();goCell(${i})}">
+      <button class="go-btn" onclick="goCell(${i})">GO</button>
+      <div class="hdr-actions">
+        <button class="ic${S[i].muted?' muted':''}" id="mute-${i}" onclick="toggleMute(${i})" title="Mute">${S[i].muted?'🔇':'🔊'}</button>
+        <button class="ic" onclick="focusCell(${i})" title="Focus">◉</button>
+        <button class="ic" onclick="clearCell(${i})" title="Clear">✕</button>
+      </div>
+    </div>
+    <div class="cell-body" id="body-${i}">
+      <div class="spinner" id="spin-${i}"><div class="spin-ring"></div></div>
+      <div class="yt-target" id="yt-${i}"></div>
+      <iframe class="web-frame" id="web-${i}"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+        onload="onWebLoad(${i})" onerror="onWebErr(${i})"></iframe>
+      <div class="drop-zone" id="dz-${i}" onclick="document.getElementById('url-${i}').focus()">
+        <div class="dz-num">${i+1}</div>
+        <div class="dz-hint">CHANNEL ${i+1} · ${S[i].mode==='yt'?'YouTube Video':'Website'}<br>Paste a URL above and tap GO</div>
+        <div class="qp-row" id="qpr-${i}">
+          ${S[i].mode==='yt' ? ytQP : webQP}
+        </div>
+      </div>
+      <div class="err-overlay" id="err-${i}">
+        <div class="err-icon">⚠</div>
+        <div class="err-title" id="err-title-${i}">UNAVAILABLE</div>
+        <div class="err-sub" id="err-sub-${i}"></div>
+        <button class="err-open" id="err-open-${i}" onclick="openTab(${i})" style="display:none">OPEN IN NEW TAB ↗</button>
+      </div>
+    </div>
+    <div class="cell-ov">
+      <button class="ov-b" onclick="focusCell(${i})">FOCUS</button>
+      <button class="ov-b" onclick="clearCell(${i})">CLEAR</button>
+    </div>`;
+}
+
+// ══ MODE ══
+function setMode(i, mode) {
+  if(S[i].mode===mode) return;
+  S[i].mode = mode;
+  // update cell class stripe
+  const cell = document.getElementById(`cell-${i}`);
+  cell.classList.toggle('mode-yt',  mode==='yt');
+  cell.classList.toggle('mode-web', mode==='web');
+  // update pills
+  document.getElementById(`mpyt-${i}`).className  = 'mp-btn'+(mode==='yt'?' on':'');
+  document.getElementById(`mpweb-${i}`).className = 'mp-btn'+(mode==='web'?' on web':'');
+  // update placeholder & quickpicks
+  const field = document.getElementById(`url-${i}`);
+  field.placeholder = mode==='yt' ? 'YouTube URL, youtu.be/… or video ID' : 'Website URL or search term…';
+  field.value = '';
+  const qpr = document.getElementById(`qpr-${i}`);
+  if(mode==='yt') {
+    qpr.innerHTML = YT_PICKS.map(q=>`<button class="qp yt" onclick="event.stopPropagation();loadYT(${i},'${q.id}','${q.label}')">${q.label}</button>`).join('');
+  } else {
+    qpr.innerHTML = WEB_PICKS.map(q=>`<button class="qp" onclick="event.stopPropagation();loadWeb(${i},'${q.url}')">${q.label}</button>`).join('');
+  }
+  // update hint
+  const dz = document.getElementById(`dz-${i}`);
+  const hint = dz.querySelector('.dz-hint');
+  if(hint) hint.innerHTML = `CHANNEL ${i+1} · ${mode==='yt'?'YouTube Video':'Website'}<br>Paste a URL above and tap GO`;
+  // clear previous content
+  clearContent(i);
+}
+
+// ══ GO (auto-detect) ══
+function goCell(i) {
+  const raw = document.getElementById(`url-${i}`).value.trim();
+  if(!raw) return;
+  if(S[i].mode==='yt') {
+    const vid = extractVideoId(raw);
+    if(vid) { loadYT(i, vid); return; }
+    // fallback: treat as web if not a YT url
+    showErr(i,'Not a valid YouTube URL or video ID.','',false);
+  } else {
+    loadWeb(i, normalizeWebUrl(raw));
+  }
+}
+
+// ══ YOUTUBE ══
+function loadYT(i, vid, label) {
+  S[i].videoId = vid;
+  S[i].mode = 'yt';
+  const cell = document.getElementById(`cell-${i}`);
+  cell.classList.add('mode-yt'); cell.classList.remove('mode-web');
+  document.getElementById(`url-${i}`).value = label ? `${label}  (${vid})` : `https://youtu.be/${vid}`;
+  hideErr(i); hideDZ(i); showSpin(i); focusCell(i);
+  // hide web frame
+  const wf = document.getElementById(`web-${i}`);
+  wf.classList.remove('show'); wf.src='';
+
+  if(!ytReady) { pending[i]={type:'yt',vid}; return; }
+  _createOrLoadYT(i, vid);
+}
+
+function _createOrLoadYT(i, vid) {
+  if(players[i]) {
+    players[i].loadVideoById(vid);
+  } else {
+    players[i] = new YT.Player(`yt-${i}`, {
+      videoId: vid,
+      playerVars: {
+        autoplay:1, mute: S[i].muted?1:0, controls:1,
+        rel:0, modestbranding:1, enablejsapi:1,
+        origin: window.location.origin||'*', playsinline:1,
+      },
+      events: {
+        onReady:       e => { hideSpin(i); if(S[i].muted) e.target.mute(); },
+        onStateChange: e => {
+          if(e.data===YT.PlayerState.PLAYING)   hideSpin(i);
+          if(e.data===YT.PlayerState.BUFFERING) showSpin(i);
+        },
+        onError: e => {
+          hideSpin(i);
+          const m={2:'Invalid video ID.',5:'Cannot play in HTML5.',
+            100:'Video not found or private.',
+            101:'Owner has disabled embedding.',150:'Owner has disabled embedding.'};
+          showErr(i, m[e.data]||`YouTube error ${e.data}.`, `https://youtu.be/${vid}`, true);
+        }
+      }
+    });
+  }
+}
+
+window.onYouTubeIframeAPIReady = function() {
+  ytReady = true;
+  for(const [idx,p] of Object.entries(pending)) {
+    const i=parseInt(idx);
+    if(p.type==='yt') _createOrLoadYT(i, p.vid);
+  }
+  pending = {};
+};
+
+// ══ WEB ══
+function loadWeb(i, url) {
+  if(!url) return;
+  S[i].webUrl = url;
+  S[i].mode   = 'web';
+  const cell  = document.getElementById(`cell-${i}`);
+  cell.classList.add('mode-web'); cell.classList.remove('mode-yt');
+  document.getElementById(`url-${i}`).value = url;
+  document.getElementById(`mpweb-${i}`).className = 'mp-btn on web';
+  document.getElementById(`mpyt-${i}`).className  = 'mp-btn';
+  S[i].errUrl = url;
+  hideErr(i); hideDZ(i); showSpin(i); focusCell(i);
+  // stop YT if running
+  if(players[i]) { try{players[i].pauseVideo();}catch(e){} }
+  // show web frame
+  const wf = document.getElementById(`web-${i}`);
+  wf.classList.add('show');
+  wf.src = url;
+}
+
+function onWebLoad(i) {
+  hideSpin(i);
+  // detect blank (X-Frame-Options block)
+  const wf = document.getElementById(`web-${i}`);
+  try {
+    const doc = wf.contentDocument;
+    if(doc && doc.body && doc.body.innerHTML==='') onWebErr(i);
+  } catch(e) { /* cross-origin fine */ }
+}
+
+function onWebErr(i) {
+  hideSpin(i);
+  showErr(i,
+    'Site blocked embedded display.',
+    'This site uses X-Frame-Options to prevent loading inside frames. You can open it in a new tab.',
+    true);
+}
+
+// ══ CONTROLS ══
+function toggleMute(i) {
+  S[i].muted = !S[i].muted;
+  const btn = document.getElementById(`mute-${i}`);
+  if(btn){ btn.textContent=S[i].muted?'🔇':'🔊'; btn.classList.toggle('muted',S[i].muted); }
+  if(players[i]) S[i].muted ? players[i].mute() : players[i].unMute();
+}
+
+function focusCell(i) {
+  S.forEach((s,j)=>s.focused=j===i);
+  document.querySelectorAll('.cell').forEach((c,j)=>c.classList.toggle('focused',j===i));
+  if(layout==='full') applyLayout();
+}
+
+function clearContent(i) {
+  if(players[i]){ try{players[i].stopVideo(); players[i].destroy();}catch(e){} players[i]=null; }
+  // Recreate yt target div (YT API replaces it)
+  const body=document.getElementById(`body-${i}`);
+  let yt=document.getElementById(`yt-${i}`);
+  if(!yt){ yt=document.createElement('div'); yt.id=`yt-${i}`; yt.className='yt-target'; body.insertBefore(yt,body.children[1]); }
+  const wf=document.getElementById(`web-${i}`); if(wf){wf.classList.remove('show');wf.src='';}
+  S[i].videoId=''; S[i].webUrl='';
+  hideErr(i); showDZ(i); hideSpin(i);
+}
+
+function clearCell(i) {
+  document.getElementById(`url-${i}`).value='';
+  clearContent(i);
+}
+
+function pauseAll()  { players.forEach(p=>p&&p.pauseVideo()); }
+function playAll()   { players.forEach(p=>p&&p.playVideo()); }
+function reloadAll() {
+  for(let i=0;i<CELLS;i++){
+    if(S[i].mode==='web' && S[i].webUrl) loadWeb(i,S[i].webUrl);
+    else if(S[i].mode==='yt' && S[i].videoId && players[i]) players[i].seekTo(0);
+  }
+}
+function clearAll() { for(let i=0;i<CELLS;i++) clearCell(i); }
+
+function openTab(i) { if(S[i].errUrl) window.open(S[i].errUrl,'_blank'); }
+
+// ══ LAYOUT ══
+function setLayout(name,el){
+  layout=name;
+  document.querySelectorAll('.li').forEach(b=>b.classList.remove('on'));
+  if(el) el.classList.add('on');
+  applyLayout();
+}
+function applyLayout(){
+  const g=document.getElementById('grid');
+  g.className='';
+  if(layout==='pip')  g.classList.add('l-pip');
+  if(layout==='full'){
+    g.classList.add('l-full');
+    document.querySelectorAll('.cell').forEach((c,i)=>c.classList.toggle('focused',S[i].focused));
+  }
+}
+
+// ══ UI HELPERS ══
+function showDZ(i)  { document.getElementById(`dz-${i}`)?.classList.remove('gone'); }
+function hideDZ(i)  { document.getElementById(`dz-${i}`)?.classList.add('gone'); }
+function showSpin(i){ document.getElementById(`spin-${i}`)?.classList.add('show'); }
+function hideSpin(i){ document.getElementById(`spin-${i}`)?.classList.remove('show'); }
+function showErr(i,title,sub,showOpen){
+  document.getElementById(`err-title-${i}`).textContent=title;
+  document.getElementById(`err-sub-${i}`).textContent=sub;
+  const ob=document.getElementById(`err-open-${i}`);
+  if(ob) ob.style.display=showOpen?'inline-block':'none';
+  document.getElementById(`err-${i}`).classList.add('show');
+  hideSpin(i);
+}
+function hideErr(i){ document.getElementById(`err-${i}`)?.classList.remove('show'); }
+
+// ══ INIT ══
+buildGrid();
+const s=document.createElement('script');
+s.src='https://www.youtube.com/iframe_api';
+document.head.appendChild(s);
+</script>
+</body>
+</html>

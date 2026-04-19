@@ -422,18 +422,23 @@ function setMode(i, mode) {
   clearContent(i);
 }
 
-// ══ GO (auto-detect) ══
+// ══ GO (auto-detect — always tries YT first, falls back to web) ══
 function goCell(i) {
   const raw = document.getElementById(`url-${i}`).value.trim();
   if(!raw) return;
-  if(S[i].mode==='yt') {
-    const vid = extractVideoId(raw);
-    if(vid) { loadYT(i, vid); return; }
-    // fallback: treat as web if not a YT url
-    showErr(i,'Not a valid YouTube URL or video ID.','',false);
-  } else {
-    loadWeb(i, normalizeWebUrl(raw));
+
+  // Always try YouTube detection first regardless of current mode
+  const vid = extractVideoId(raw);
+  if(vid) {
+    // Switch pane to YT mode if needed
+    if(S[i].mode !== 'yt') setMode(i, 'yt');
+    loadYT(i, vid);
+    return;
   }
+
+  // Not a YouTube URL — treat as website regardless of current mode
+  if(S[i].mode !== 'web') setMode(i, 'web');
+  loadWeb(i, normalizeWebUrl(raw));
 }
 
 // ══ YOUTUBE ══

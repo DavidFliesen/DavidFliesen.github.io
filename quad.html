@@ -370,9 +370,7 @@ function cellHTML(i) {
     <div class="cell-body" id="body-${i}">
       <div class="spinner" id="spin-${i}"><div class="spin-ring"></div></div>
       <div class="yt-target" id="yt-${i}"></div>
-      <iframe class="web-frame" id="web-${i}"
-        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
-        onload="onWebLoad(${i})" onerror="onWebErr(${i})"></iframe>
+      <iframe class="web-frame" id="web-${i}"></iframe>
       <div class="drop-zone" id="dz-${i}" onclick="document.getElementById('url-${i}').focus()">
         <div class="dz-num">${i+1}</div>
         <div class="dz-hint">CHANNEL ${i+1} · ${S[i].mode==='yt'?'YouTube Video':'Website'}<br>Paste a URL above and tap GO</div>
@@ -509,13 +507,17 @@ function loadWeb(i, url) {
   hideErr(i); hideDZ(i); showSpin(i); focusCell(i);
   // stop YT if running
   if(players[i]) { try{players[i].pauseVideo();}catch(e){} }
-  // show web frame
+  // configure and show web frame — attach listeners fresh each load
   const wf = document.getElementById(`web-${i}`);
+  wf.sandbox = 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox';
+  wf.onload  = () => onWebLoad(i);
+  wf.onerror = () => onWebErr(i);
   wf.classList.add('show');
   wf.src = url;
 }
 
 function onWebLoad(i) {
+  if(S[i].mode !== 'web') return; // ignore YT API iframe events
   hideSpin(i);
   // detect blank (X-Frame-Options block)
   const wf = document.getElementById(`web-${i}`);
@@ -526,6 +528,7 @@ function onWebLoad(i) {
 }
 
 function onWebErr(i) {
+  if(S[i].mode !== 'web') return; // ignore YT API iframe events
   hideSpin(i);
   showErr(i,
     'Site blocked embedded display.',

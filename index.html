@@ -86,7 +86,7 @@
     }
     .hero-inner {
       display: grid;
-      grid-template-columns: 1fr 300px;
+      grid-template-columns: 300px 1fr;
       gap: 40px;
       align-items: center;
       padding: 28px 0;
@@ -255,8 +255,8 @@
     /* MUSIC */
     .music-layout {
       display: grid;
-      grid-template-columns: 380px 1fr;
-      gap: 40px;
+      grid-template-columns: 2fr 1fr;
+      gap: 36px;
       align-items: start;
     }
     .music-left {}
@@ -320,7 +320,7 @@
     .mm-link:hover { color: #fff; }
 
     /* STORY GRID */
-    .story-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 40px; }
+    .story-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px; }
     .story-card {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: 6px; overflow: hidden;
@@ -408,7 +408,7 @@
       .hero-inner { grid-template-columns: 1fr; }
       .hero-avatar { max-width: 180px; }
       .projects-grid { grid-template-columns: 1fr; }
-      .story-grid { grid-template-columns: 1fr; }
+      .story-grid { grid-template-columns: repeat(2, 1fr); }
       .mm-grid { grid-template-columns: repeat(2, 1fr); }
       .nav-links { display: none; }
       h2 { margin-bottom: 32px; }
@@ -437,6 +437,18 @@
   <div class="hero-glow"></div>
   <div class="wrap">
     <div class="hero-inner">
+      <div class="hero-right">
+        <img src="images/david-fliesen.png" alt="David Fliesen" class="hero-avatar" />
+        <div class="terminal">
+          <div class="terminal-dots"><span></span><span></span><span></span></div>
+          <span class="terminal-label">terminal</span>
+          <div class="term-line"><span class="term-prompt">▶</span><span class="term-cmd">skills --list ai multimedia storytelling</span></div>
+          <div class="term-line term-val">LangChain · RAG · LangGraph · FastAPI · D-ID · OpenAI · Gradio · Plotly</div>
+          <div class="term-line" style="margin-top:8px"><span class="term-prompt">▶</span><span class="term-cmd">experience --years</span></div>
+          <div class="term-line term-val">15+ yrs AI &nbsp;|&nbsp; Purdue GenAI Specialization '26 &nbsp;|&nbsp; DoD 2008</div>
+          <div class="term-line" style="margin-top:8px"><span class="term-prompt">▶</span><span class="term-cmd">status</span></div>
+        </div>
+      </div>
       <div class="hero-content">
         <p class="hero-tag"><span class="dot"></span>Hybrid Generative AI Multimedia Developer</p>
         <h1>
@@ -455,18 +467,6 @@
         <div class="hero-btns">
           <a href="#ai" class="btn-primary">View Projects</a>
           <a href="https://www.linkedin.com/in/fliesen/" class="btn-outline" target="_blank" rel="noopener">LinkedIn ↗</a>
-        </div>
-      </div>
-      <div class="hero-right">
-        <img src="images/david-fliesen.png" alt="David Fliesen" class="hero-avatar" />
-        <div class="terminal">
-          <div class="terminal-dots"><span></span><span></span><span></span></div>
-          <span class="terminal-label">terminal</span>
-          <div class="term-line"><span class="term-prompt">▶</span><span class="term-cmd">skills --list ai multimedia storytelling</span></div>
-          <div class="term-line term-val">LangChain · RAG · LangGraph · FastAPI · D-ID · OpenAI · Gradio · Plotly</div>
-          <div class="term-line" style="margin-top:8px"><span class="term-prompt">▶</span><span class="term-cmd">experience --years</span></div>
-          <div class="term-line term-val">15+ yrs AI &nbsp;|&nbsp; Purdue GenAI Specialization '26 &nbsp;|&nbsp; DoD 2008</div>
-          <div class="term-line" style="margin-top:8px"><span class="term-prompt">▶</span><span class="term-cmd">status</span></div>
         </div>
       </div>
     </div>

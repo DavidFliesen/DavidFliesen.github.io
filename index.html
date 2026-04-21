@@ -253,18 +253,40 @@
     .project-link:hover { color: #fff; }
 
     /* MUSIC */
-    .music-intro { max-width: 640px; margin-bottom: 36px; }
-    .music-intro p { font-size: 18px; }
+    .music-layout {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+    .music-left {}
+    .music-intro { margin-bottom: 20px; }
+    .music-intro p { font-size: 16px; }
     .music-intro a { color: var(--cyan); text-decoration: none; }
     .music-intro a:hover { text-decoration: underline; }
+    .music-video {
+      position: relative; width: 100%;
+      aspect-ratio: 16/9;
+      border-radius: 6px; overflow: hidden;
+      border: 1px solid var(--border); background: #000;
+    }
+    .music-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+    .music-video-label {
+      font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      color: var(--muted); letter-spacing: 0.1em; margin-top: 8px;
+      text-align: center;
+    }
     .track-list { list-style: none; display: flex; flex-direction: column; gap: 0; }
-    .track-item { border-bottom: 1px solid var(--border); padding: 12px 0; display: flex; flex-direction: column; gap: 6px; }
-    .track-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text); letter-spacing: 0.06em; }
-    .track-audio { width: 100%; height: 32px; accent-color: var(--cyan); }
-    .now-playing { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--muted); text-align: center; margin-top: 24px; }
+    .track-item { border-bottom: 1px solid var(--border); padding: 10px 0; display: flex; flex-direction: column; gap: 5px; }
+    .track-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text); letter-spacing: 0.06em; }
+    .track-audio { width: 100%; height: 28px; accent-color: var(--cyan); }
+    .now-playing { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--muted); margin-top: 16px; }
+    @media (max-width: 820px) {
+      .music-layout { grid-template-columns: 1fr; }
+    }
 
     /* MULTIMEDIA */
-    .mm-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
+    .mm-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
     .mm-card {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: 6px; overflow: hidden;
@@ -379,7 +401,7 @@
     @media (max-width: 900px) {
       .projects-grid { grid-template-columns: repeat(2, 1fr); }
       .roots-grid { grid-template-columns: 1fr; }
-      .mm-grid { grid-template-columns: 1fr; }
+      .mm-grid { grid-template-columns: repeat(2, 1fr); }
       .story-grid { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 640px) {
@@ -387,6 +409,7 @@
       .hero-avatar { max-width: 180px; }
       .projects-grid { grid-template-columns: 1fr; }
       .story-grid { grid-template-columns: 1fr; }
+      .mm-grid { grid-template-columns: repeat(2, 1fr); }
       .nav-links { display: none; }
       h2 { margin-bottom: 32px; }
     }
@@ -584,23 +607,33 @@
   <div class="wrap">
     <p class="section-tag">// AI Creative</p>
     <h2>Suno AI Music</h2>
-    <div class="music-intro">
-      <p>AI-composed original music spanning country, rock, jazz, and pop — including a <strong>Suno contest winner</strong>. Exploring where machine learning meets genuine artistic voice. Also developing the <em>Lira</em> album as a human-AI collaboration.</p>
-      <p style="margin-top:12px"><a href="https://suno.com/playlist/8f7963c6-b967-4a59-8835-9accdd64325f" target="_blank" rel="noopener">💿 Lira Album (In Dev)</a></p>
+    <div class="music-layout">
+      <!-- LEFT: intro + featured video -->
+      <div class="music-left">
+        <div class="music-intro">
+          <p>AI-composed original music spanning country, rock, jazz, and pop — including a <strong>Suno contest winner</strong>. Exploring where machine learning meets genuine artistic voice. Also developing the <em>Lira</em> album as a human-AI collaboration.</p>
+          <p style="margin-top:10px"><a href="https://suno.com/playlist/8f7963c6-b967-4a59-8835-9accdd64325f" target="_blank" rel="noopener">💿 Lira Album (In Dev)</a></p>
+        </div>
+        <div class="music-video">
+          <iframe src="https://www.youtube-nocookie.com/embed/NmVU5NulA5A?playsinline=1&rel=0&modestbranding=1" title="Last Call (on the old me) by Lira" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <p class="music-video-label">Last Call (on the old me) · Lira</p>
+        <p class="now-playing" style="margin-top:20px">Now Playing</p>
+        <p id="npTitle" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-top:4px;min-height:16px;"></p>
+      </div>
+      <!-- RIGHT: track list -->
+      <ul class="track-list">
+        <li class="track-item"><span class="track-title">Last Call (on the old me)</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/6d71e1e2-6e70-466e-b8cf-de9c7e3e6cc5.mp3"></audio></li>
+        <li class="track-item"><span class="track-title">The Bee's Knees &amp; the Cat's Pajamas</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/cd65c3e0-a05c-4ec8-8bc2-b73e2b8ead0f.mp3"></audio></li>
+        <li class="track-item"><span class="track-title">Cutting Through Me Like Lightning</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/13736d50-2437-4bcf-8fc6-7b7bb1fba447.mp3"></audio></li>
+        <li class="track-item"><span class="track-title">Rush Rush Rush</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/22b89bcd-1498-45d5-8ff5-1e0fa64dd81a.mp3"></audio></li>
+        <li class="track-item"><span class="track-title">Small Town</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/d06617b6-7cdf-4e3e-be0d-e5e10d62a9b3.mp3"></audio></li>
+        <li class="track-item"><span class="track-title">ChatGPT Just Gypped Me!</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/cd36da62-19b9-4ad5-bfb4-8bae00753be5.mp3"></audio></li>
+        <li class="track-item"><span class="track-title">Front Porch Swings (all doggone day)</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/c7f9b3db-9a8e-4745-9f8a-28124e6dff3b.mp3"></audio></li>
+        <li class="track-item"><span class="track-title">Femme Fatale of the Feline World</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/51cc1c69-1b75-44d6-8a8d-d0bbda63e72d.mp3"></audio></li>
+        <li class="track-item"><span class="track-title">Cast It All Away</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/2cce44ff-1f5e-4639-af58-e9c8aace7fb4.mp3"></audio></li>
+      </ul>
     </div>
-    <ul class="track-list">
-      <li class="track-item"><span class="track-title">Last Call (on the old me)</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/6d71e1e2-6e70-466e-b8cf-de9c7e3e6cc5.mp3"></audio></li>
-      <li class="track-item"><span class="track-title">The Bee's Knees &amp; the Cat's Pajamas</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/cd65c3e0-a05c-4ec8-8bc2-b73e2b8ead0f.mp3"></audio></li>
-      <li class="track-item"><span class="track-title">Cutting Through Me Like Lightning</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/13736d50-2437-4bcf-8fc6-7b7bb1fba447.mp3"></audio></li>
-      <li class="track-item"><span class="track-title">Rush Rush Rush</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/22b89bcd-1498-45d5-8ff5-1e0fa64dd81a.mp3"></audio></li>
-      <li class="track-item"><span class="track-title">Small Town</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/d06617b6-7cdf-4e3e-be0d-e5e10d62a9b3.mp3"></audio></li>
-      <li class="track-item"><span class="track-title">ChatGPT Just Gypped Me!</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/cd36da62-19b9-4ad5-bfb4-8bae00753be5.mp3"></audio></li>
-      <li class="track-item"><span class="track-title">Front Porch Swings (all doggone day)</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/c7f9b3db-9a8e-4745-9f8a-28124e6dff3b.mp3"></audio></li>
-      <li class="track-item"><span class="track-title">Femme Fatale of the Feline World</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/51cc1c69-1b75-44d6-8a8d-d0bbda63e72d.mp3"></audio></li>
-      <li class="track-item"><span class="track-title">Cast It All Away</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/2cce44ff-1f5e-4639-af58-e9c8aace7fb4.mp3"></audio></li>
-    </ul>
-    <p class="now-playing">Now Playing</p>
-    <p id="npTitle" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-align:center;margin-top:4px;min-height:16px;"></p>
   </div>
 </section>
 

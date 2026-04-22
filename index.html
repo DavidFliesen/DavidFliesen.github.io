@@ -279,7 +279,7 @@
     .track-list { list-style: none; display: flex; flex-direction: column; gap: 0; min-width: 0; }
     .track-item { border-bottom: 1px solid var(--border); padding: 10px 0; display: flex; flex-direction: column; gap: 6px; }
     .track-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text); letter-spacing: 0.06em; }
-    .track-audio { width: 100%; min-width: 0; height: 36px; accent-color: var(--cyan); display: block; }
+    .suno-embed { width: 100%; height: 52px; border: none; border-radius: 4px; display: block; }
     .now-playing { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--muted); margin-top: 16px; }
     @media (max-width: 820px) {
       .music-layout { grid-template-columns: 1fr; }
@@ -626,15 +626,42 @@
       </div>
       <!-- RIGHT: track list -->
       <ul class="track-list">
-        <li class="track-item"><span class="track-title">Last Call (on the old me)</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/6d71e1e2-6e70-466e-b8cf-de9c7e3e6cc5.mp3"></audio></li>
-        <li class="track-item"><span class="track-title">The Bee's Knees &amp; the Cat's Pajamas</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/cd65c3e0-a05c-4ec8-8bc2-b73e2b8ead0f.mp3"></audio></li>
-        <li class="track-item"><span class="track-title">Cutting Through Me Like Lightning</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/13736d50-2437-4bcf-8fc6-7b7bb1fba447.mp3"></audio></li>
-        <li class="track-item"><span class="track-title">Rush Rush Rush</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/22b89bcd-1498-45d5-8ff5-1e0fa64dd81a.mp3"></audio></li>
-        <li class="track-item"><span class="track-title">Small Town</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/d06617b6-7cdf-4e3e-be0d-e5e10d62a9b3.mp3"></audio></li>
-        <li class="track-item"><span class="track-title">ChatGPT Just Gypped Me!</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/cd36da62-19b9-4ad5-bfb4-8bae00753be5.mp3"></audio></li>
-        <li class="track-item"><span class="track-title">Front Porch Swings (all doggone day)</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/c7f9b3db-9a8e-4745-9f8a-28124e6dff3b.mp3"></audio></li>
-        <li class="track-item"><span class="track-title">Femme Fatale of the Feline World</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/51cc1c69-1b75-44d6-8a8d-d0bbda63e72d.mp3"></audio></li>
-        <li class="track-item"><span class="track-title">Cast It All Away</span><audio class="track-audio" controls preload="none" src="https://cdn1.suno.ai/2cce44ff-1f5e-4639-af58-e9c8aace7fb4.mp3"></audio></li>
+        <li class="track-item">
+          <span class="track-title">Last Call (on the old me) <span style="color:var(--gold);font-size:9px;letter-spacing:0.1em;">🏆 CONTEST WINNER</span></span>
+          <iframe src="https://suno.com/embed/6d71e1e2-6e70-466e-b8cf-de9c7e3e6cc5" class="suno-embed" allow="autoplay" loading="lazy"></iframe>
+        </li>
+        <li class="track-item">
+          <span class="track-title">The Bee's Knees &amp; the Cat's Pajamas</span>
+          <iframe src="https://suno.com/embed/cd65c3e0-a05c-4ec8-8bc2-b73e2b8ead0f" class="suno-embed" allow="autoplay" loading="lazy"></iframe>
+        </li>
+        <li class="track-item">
+          <span class="track-title">Cutting Through Me Like Lightning</span>
+          <iframe src="https://suno.com/embed/13736d50-2437-4bcf-8fc6-7b7bb1fba447" class="suno-embed" allow="autoplay" loading="lazy"></iframe>
+        </li>
+        <li class="track-item">
+          <span class="track-title">Rush Rush Rush</span>
+          <iframe src="https://suno.com/embed/22b89bcd-1498-45d5-8ff5-1e0fa64dd81a" class="suno-embed" allow="autoplay" loading="lazy"></iframe>
+        </li>
+        <li class="track-item">
+          <span class="track-title">Small Town</span>
+          <iframe src="https://suno.com/embed/d06617b6-7cdf-4e3e-be0d-e5e10d62a9b3" class="suno-embed" allow="autoplay" loading="lazy"></iframe>
+        </li>
+        <li class="track-item">
+          <span class="track-title">ChatGPT Just Gypped Me!</span>
+          <iframe src="https://suno.com/embed/cd36da62-19b9-4ad5-bfb4-8bae00753be5" class="suno-embed" allow="autoplay" loading="lazy"></iframe>
+        </li>
+        <li class="track-item">
+          <span class="track-title">Front Porch Swings (all doggone day)</span>
+          <iframe src="https://suno.com/embed/c7f9b3db-9a8e-4745-9f8a-28124e6dff3b" class="suno-embed" allow="autoplay" loading="lazy"></iframe>
+        </li>
+        <li class="track-item">
+          <span class="track-title">Femme Fatale of the Feline World</span>
+          <iframe src="https://suno.com/embed/51cc1c69-1b75-44d6-8a8d-d0bbda63e72d" class="suno-embed" allow="autoplay" loading="lazy"></iframe>
+        </li>
+        <li class="track-item">
+          <span class="track-title">Cast It All Away</span>
+          <iframe src="https://suno.com/embed/2cce44ff-1f5e-4639-af58-e9c8aace7fb4" class="suno-embed" allow="autoplay" loading="lazy"></iframe>
+        </li>
       </ul>
     </div>
   </div>
@@ -865,15 +892,6 @@
     document.getElementById('lightboxImg').src = '';
   }
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
-
-  document.querySelectorAll('.track-audio').forEach(audio => {
-    audio.addEventListener('play', () => {
-      document.querySelectorAll('.track-audio').forEach(a => { if (a !== audio) a.pause(); });
-      const title = audio.closest('.track-item').querySelector('.track-title').textContent;
-      document.getElementById('npTitle').textContent = '♪ ' + title;
-    });
-    audio.addEventListener('ended', () => { document.getElementById('npTitle').textContent = ''; });
-  });
 </script>
 
 </body>

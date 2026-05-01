@@ -471,31 +471,17 @@ body::after {
   font-size:9px; color:var(--dim); letter-spacing:.03em;
 }
 
-/* right: multi-platform quick-picks */
-.dz-picks {
-  display:flex; flex-direction:column;
-  padding:16px 14px; gap:6px; overflow-y:auto;
+/* right: supported sources reference */
+.dz-ref {
+  display:flex; flex-direction:column; justify-content:center;
+  padding:20px 22px 20px 18px;
+  gap:12px;
+  overflow:hidden;
 }
-
-.qp {
-  background:var(--panel2); border:1px solid var(--border2);
-  color:var(--dim); font-family:'Share Tech Mono',monospace;
-  font-size:10px; padding:7px 10px; border-radius:2px;
-  cursor:pointer; white-space:nowrap; transition:all .15s;
-  letter-spacing:.04em; text-align:left; width:100%;
-}
-.qp:hover      { border-color:var(--cyan);   color:var(--cyan);   background:var(--cyan-dim); }
-.qp.yt:hover   { border-color:var(--orange); color:var(--orange); background:var(--orange-d); }
-.qp.vim:hover  { border-color:var(--purple); color:var(--purple); background:rgba(213,0,249,.1); }
-.qp.dm:hover   { border-color:var(--yellow); color:var(--yellow); background:var(--yellow-d); }
-.qp.web:hover  { border-color:var(--cyan);   color:var(--cyan);   background:var(--cyan-dim); }
-
-.dz-picks-title {
+.dz-ref-title {
   font-family:'Orbitron',sans-serif; font-weight:700;
-  font-size:7px; letter-spacing:.2em; color:var(--dim);
-  padding-bottom:5px; border-bottom:1px solid var(--border2);
-  margin-bottom:2px;
-  display:flex; align-items:center; gap:5px;
+  font-size:9px; letter-spacing:.2em; color:var(--dim);
+  padding-bottom:8px; border-bottom:1px solid var(--border2);
 }
 
 /* error overlay */
@@ -593,41 +579,7 @@ body::after {
 // Hostname used for Twitch parent param — update if you change hosting
 const HOST = window.location.hostname || 'davidfliesen.github.io';
 
-// ── QUICK-PICKS ─────────────────────────────────────────────────────────────
-// Intentionally apolitical — ambient, music, and creative content only.
-// YouTube IDs last verified April 2025.
-// Vimeo/Dailymotion IDs are public embeddable videos.
-// Replace any that show TRANSMISSION ERROR with a fresh ID from that platform.
-
-const YT_QP = [
-  { label:'LOFI GIRL',    id:'jfKfPfyJRdk', note:'24/7 chill lo-fi beats · Lofi Girl'   },
-  { label:'DEEP OCEAN',   id:'BHACKCNDMW8', note:'Ambient underwater footage'            },
-  { label:'COFFEE JAZZ',  id:'fEvM-OUbaKs', note:'24/7 café jazz · BGM Channel'         },
-  { label:'PIANO JAZZ',   id:'Dx5qFachd3A', note:'24/7 relaxing jazz piano · BGM'       },
-  { label:'RAINY JAZZ',   id:'DSGyEsJ17cI', note:'24/7 rainy jazz & bossa nova · BGM'   },
-  { label:'CHILLHOP',     id:'5qap5aO4i9A', note:'24/7 chillhop · Lofi Girl 2nd stream' },
-  { label:'SPACE MUSIC',  id:'tNkZsRW7h2c', note:'24/7 space ambient · relaxation'      },
-];
-
-// Vimeo — public embeddable short films & showcases
-const VIMEO_QP = [
-  { label:'VIMEO STAFF PICKS', id:'147585862', note:'Showreel — Vimeo best of'           },
-  { label:'SUNRISE TIMELAPSE', id:'32001208',  note:'Beautiful dawn timelapse'            },
-  { label:'NATURE SHORT',      id:'22439234',  note:'Award-winning nature short film'    },
-];
-
-// Dailymotion — embeddable videos
-const DM_QP = [
-  { label:'NATURE & WILDLIFE', id:'x8jqxh3',  note:'Nature & wildlife compilation'      },
-  { label:'SPACE DOCUMENTARY', id:'x7zsch3',  note:'Space exploration documentary'      },
-];
-
-// Web pages — confirmed iframe-embeddable
-const WEB_QP = [
-  { label:'AI — WIKIPEDIA',    url:'https://en.wikipedia.org/wiki/Artificial_intelligence', note:'Wikipedia: Artificial Intelligence' },
-  { label:'WIKIPEDIA HOME',    url:'https://en.wikipedia.org',                               note:'Wikipedia main page'               },
-  { label:'INTERNET ARCHIVE',  url:'https://archive.org',                                    note:'The Internet Archive'              },
-];
+// No quick-picks — users paste their own URLs
 
 const CELLS = 4;
 let players = new Array(CELLS).fill(null);
@@ -734,15 +686,6 @@ function buildGrid() {
 }
 
 function cellHTML(i) {
-  const ytBtns   = YT_QP.map(q=>
-    `<button class="qp yt"  onclick="event.stopPropagation();loadYT(${i},'${q.id}')"      title="${q.note}">${q.label}</button>`).join('');
-  const vimeoBtns = VIMEO_QP.map(q=>
-    `<button class="qp vim" onclick="event.stopPropagation();loadVimeo(${i},'${q.id}')"   title="${q.note}">${q.label}</button>`).join('');
-  const dmBtns    = DM_QP.map(q=>
-    `<button class="qp dm"  onclick="event.stopPropagation();loadDM(${i},'${q.id}')"      title="${q.note}">${q.label}</button>`).join('');
-  const webBtns   = WEB_QP.map(q=>
-    `<button class="qp web" onclick="event.stopPropagation();loadWeb(${i},'${q.url}')"    title="${q.note}">${q.label}</button>`).join('');
-
   return `
     <div class="mode-stripe"></div>
     <div class="cell-hdr" onclick="event.stopPropagation()">
@@ -772,11 +715,16 @@ function cellHTML(i) {
       <div class="drop-zone" id="dz-${i}">
         <div class="dz-grid">
 
-          <!-- LEFT: how-to instructions -->
+          <!-- LEFT: channel identity -->
           <div class="dz-instructions">
             <div class="dz-ch">CH${i+1}</div>
             <div class="dz-title">AWAITING SIGNAL</div>
-            <div class="dz-subtitle">Paste any URL above and tap GO, or pick a sample below</div>
+            <div class="dz-subtitle">Paste any URL above and tap GO</div>
+          </div>
+
+          <!-- RIGHT: supported URL format reference -->
+          <div class="dz-ref">
+            <div class="dz-ref-title">SUPPORTED SOURCES</div>
             <div class="dz-formats">
               <div class="dz-fmt-row"><span class="fmt-tag yt">YT</span><span class="fmt-txt">youtube.com/watch?v=… · youtu.be/…</span></div>
               <div class="dz-fmt-row"><span class="fmt-tag vim">VIM</span><span class="fmt-txt">vimeo.com/123456</span></div>
@@ -785,18 +733,6 @@ function cellHTML(i) {
               <div class="dz-fmt-row"><span class="fmt-tag twt">TWI</span><span class="fmt-txt">twitch.tv/channelname</span></div>
               <div class="dz-fmt-row"><span class="fmt-tag web">WEB</span><span class="fmt-txt">Any embeddable website URL</span></div>
             </div>
-          </div>
-
-          <!-- RIGHT: multi-platform quick-picks -->
-          <div class="dz-picks">
-            <div class="dz-picks-title"><span class="fmt-tag yt" style="font-size:7px;padding:1px 4px">YT</span> YOUTUBE</div>
-            ${ytBtns}
-            <div class="dz-picks-title" style="margin-top:6px"><span class="fmt-tag vim" style="font-size:7px;padding:1px 4px">VIM</span> VIMEO</div>
-            ${vimeoBtns}
-            <div class="dz-picks-title" style="margin-top:6px"><span class="fmt-tag dm" style="font-size:7px;padding:1px 4px">DM</span> DAILYMOTION</div>
-            ${dmBtns}
-            <div class="dz-picks-title" style="margin-top:6px"><span class="fmt-tag web" style="font-size:7px;padding:1px 4px">WEB</span> WEBSITES</div>
-            ${webBtns}
           </div>
 
         </div>

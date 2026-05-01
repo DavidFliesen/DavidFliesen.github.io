@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+  ╔══════════════════════════════════════════════════════════╗
+  ║  PODQUAD // Multi-Source Command Center                  ║
+  ║  View 4 video streams or websites simultaneously         ║
+  ║                                                          ║
+  ║  Supported video platforms:                              ║
+  ║    YouTube · Vimeo · Dailymotion · Rumble · Twitch       ║
+  ║                                                          ║
+  ║  Supported websites:                                     ║
+  ║    Any site that permits iframe embedding                ║
+  ║    Note: Some sites (social media, major TV networks)    ║
+  ║    block iframe embedding by design — use Open in Tab    ║
+  ║                                                          ║
+  ║  Built by David Fliesen / Cibola Studios                 ║
+  ║  davidfliesen.github.io                                  ║
+  ╚══════════════════════════════════════════════════════════╝
+-->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="description" content="PodQuad — Watch 4 video streams or websites simultaneously. Supports YouTube, Vimeo, Dailymotion, Rumble, Twitch, and embeddable websites. Built by David Fliesen / Cibola Studios.">
+<title>PODQUAD // COMMAND CENTER</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════
+   DESIGN TOKENS
+══════════════════════════════════════ */
+:root {
+  --bg:       #020408;
+  --bg2:      #060d14;
+  --panel:    #080f18;
+  --panel2:   #0b1520;
+  --border:   #0d2035;
+  --border2:  #163050;
+  --cyan:     #00e5ff;
+  --cyan-dim: rgba(0,229,255,0.08);
+  --cyan-mid: rgba(0,229,255,0.2);
+  --orange:   #ff6d00;
+  --orange-d: rgba(255,109,0,0.15);
+  --green:    #39ff14;
+  --green-d:  rgba(57,255,20,0.1);
+  --purple:   #d500f9;
+  --purple-d: rgba(213,0,249,0.12);
+  --red:      #ff1744;
+  --yellow:   #ffe600;
+  --yellow-d: rgba(255,230,0,0.12);
+  --pink:     #ff4081;
+  --pink-d:   rgba(255,64,129,0.12);
+  --text:     #c8e6f0;
+  --dim:      #4a7a8a;
+  --glow-c:   0 0 14px rgba(0,229,255,0.65), 0 0 32px rgba(0,229,255,0.2);
+  --glow-o:   0 0 14px rgba(255,109,0,0.6);
+  --glow-g:   0 0 14px rgba(57,255,20,0.5);
+  --gap:      8px;
+  --bar:      72px;
+  --hdr:      52px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+html, body {
+  width:100%; height:100%;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Share Tech Mono', monospace;
+  overflow:hidden;
+}
+
+/* scanlines */
+body::after {
+  content:'';
+  position:fixed; inset:0;
+  background:repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
+  );
+  pointer-events:none; z-index:9999;
+}
+
+/* ══════════════════════════════════════
+   TOPBAR
+══════════════════════════════════════ */
+#topbar {
+  height:var(--bar);
+  background:linear-gradient(180deg,#0c1e30 0%,var(--panel) 100%);
+  border-bottom:1px solid var(--border2);
+  display:flex; align-items:center;
+  padding:0 20px; gap:12px;
+  position:relative; z-index:200;
+  box-shadow:0 2px 30px rgba(0,229,255,0.07);
+  flex-wrap:nowrap; overflow:hidden;
+}
+#topbar::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan) 25%,var(--cyan) 75%,transparent);
+  opacity:.55;
+}
+
+#logo { display:flex; flex-direction:column; gap:1px; flex-shrink:0; }
+#logo-main {
+  font-family:'Orbitron',sans-serif; font-weight:900;
+  font-size:24px; letter-spacing:.18em;
+  color:var(--cyan); text-shadow:var(--glow-c); line-height:1;
+}
+#logo-sub {
+  font-size:8px; letter-spacing:.22em;
+  color:var(--dim); text-transform:uppercase; padding-left:2px;
+}
+
+#live-badge {
+  display:flex; align-items:center; gap:5px;
+  background:var(--green-d); border:1px solid rgba(57,255,20,.3);
+  border-radius:2px; padding:4px 10px; flex-shrink:0;
+}
+.live-dot {
+  width:7px; height:7px; background:var(--green); border-radius:50%;
+  box-shadow:var(--glow-g); animation:blink 1.4s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.15} }
+#live-label {
+  font-family:'Orbitron',sans-serif; font-weight:600;
+  font-size:9px; letter-spacing:.2em; color:var(--green);
+}
+
+.sep {
+  width:1px; height:34px;
+  background:linear-gradient(180deg,transparent,var(--border2),transparent);
+  flex-shrink:0;
+}
+
+/* layout buttons */
+#layout-bar { display:flex; gap:5px; }
+.ly {
+  width:38px; height:30px;
+  background:var(--panel2); border:1px solid var(--border2);
+  border-radius:3px; cursor:pointer;
+  display:grid; gap:2px; padding:5px;
+  transition:all .2s; position:relative; overflow:hidden;
+}
+.ly::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg,var(--cyan-dim),transparent);
+  opacity:0; transition:opacity .2s;
+}
+.ly:hover::before,.ly.on::before { opacity:1; }
+.ly:hover,.ly.on { border-color:var(--cyan); box-shadow:0 0 10px rgba(0,229,255,.25); }
+.ly .s { background:var(--border2); border-radius:1px; transition:background .2s; }
+.ly.on .s,.ly:hover .s { background:var(--cyan); }
+.li-quad { grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; }
+.li-pip  { grid-template-columns:2fr 1fr; grid-template-rows:1fr 1fr; }
+.li-pip .s:first-child { grid-row:1/3; }
+.li-full { grid-template-columns:1fr; grid-template-rows:1fr; }
+
+/* action buttons */
+.tb {
+  height:34px; padding:0 12px;
+  background:var(--panel2); border:1px solid var(--border2);
+  color:var(--dim); font-family:'Orbitron',sans-serif;
+  font-size:9px; font-weight:600; letter-spacing:.1em;
+  border-radius:3px; cursor:pointer; white-space:nowrap;
+  transition:all .2s; display:flex; align-items:center; gap:5px;
+  position:relative; overflow:hidden;
+}
+.tb::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg,var(--cyan-dim),transparent);
+  opacity:0; transition:opacity .2s;
+}
+.tb:hover::before { opacity:1; }
+.tb:hover { border-color:var(--cyan); color:var(--cyan); box-shadow:0 0 10px rgba(0,229,255,.2); }
+.tb.warn:hover {
+  border-color:var(--red); color:var(--red);
+  box-shadow:0 0 10px rgba(255,23,68,.25);
+}
+.tb.warn::before { background:linear-gradient(135deg,rgba(255,23,68,.08),transparent); }
+
+/* clock */
+#clock-wrap { margin-left:auto; text-align:right; flex-shrink:0; }
+#clock-time {
+  font-family:'Orbitron',sans-serif; font-weight:600;
+  font-size:20px; color:var(--cyan); text-shadow:var(--glow-c);
+  letter-spacing:.08em; line-height:1;
+}
+#clock-date { font-size:8px; color:var(--dim); letter-spacing:.14em; margin-top:2px; }
+
+/* ══════════════════════════════════════
+   GRID
+══════════════════════════════════════ */
+#grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-template-rows:1fr 1fr;
+  gap:var(--gap); padding:var(--gap);
+  width:100%; height:calc(100vh - var(--bar));
+}
+#grid.l-pip { grid-template-columns:3fr 1fr; }
+#grid.l-pip .cell:first-child { grid-row:1/3; }
+#grid.l-full .cell { display:none; }
+#grid.l-full .cell.focused { display:flex; grid-column:1/3; grid-row:1/3; }
+
+/* ══════════════════════════════════════
+   CELL
+══════════════════════════════════════ */
+.cell {
+  background:var(--panel); border:1px solid var(--border2);
+  border-radius:4px; overflow:hidden;
+  display:flex; flex-direction:column;
+  position:relative;
+  transition:border-color .25s, box-shadow .25s;
+  min-width:0; min-height:0;
+}
+.cell.focused {
+  border-color:var(--cyan);
+  box-shadow:0 0 0 1px var(--cyan), 0 0 28px rgba(0,229,255,.12),
+             inset 0 0 28px rgba(0,229,255,.03);
+}
+
+/* corner brackets */
+.cell::before,.cell::after {
+  content:''; position:absolute;
+  width:13px; height:13px; z-index:15; pointer-events:none;
+  transition:border-color .25s;
+}
+.cell::before { top:0; left:0;  border-top:2px solid var(--border2); border-left:2px solid var(--border2); }
+.cell::after  { top:0; right:0; border-top:2px solid var(--border2); border-right:2px solid var(--border2); }
+.cell.focused::before,.cell.focused::after { border-color:var(--cyan); }
+
+.cell-bl,.cell-br {
+  position:absolute; width:13px; height:13px;
+  z-index:15; pointer-events:none; transition:border-color .25s;
+}
+.cell-bl { bottom:0; left:0;  border-bottom:2px solid var(--border2); border-left:2px solid var(--border2); }
+.cell-br { bottom:0; right:0; border-bottom:2px solid var(--border2); border-right:2px solid var(--border2); }
+.cell.focused .cell-bl,.cell.focused .cell-br { border-color:var(--cyan); }
+
+/* top stripe */
+.mode-stripe {
+  position:absolute; top:0; left:0; right:0; height:2px; z-index:12;
+  background:var(--border2); transition:background .25s, box-shadow .25s;
+}
+.cell.mode-yt    .mode-stripe { background:var(--orange); box-shadow:var(--glow-o); }
+.cell.mode-vimeo .mode-stripe { background:var(--purple); }
+.cell.mode-dm    .mode-stripe { background:var(--yellow); }
+.cell.mode-rumble.mode-stripe,
+.cell.mode-rumble .mode-stripe { background:var(--green); box-shadow:var(--glow-g); }
+.cell.mode-twitch .mode-stripe { background:var(--purple); }
+.cell.mode-web   .mode-stripe { background:var(--cyan);   box-shadow:var(--glow-c); }
+
+/* bottom stripe */
+.cell-foot {
+  height:3px; flex-shrink:0;
+  background:linear-gradient(90deg,transparent,var(--border2),transparent);
+  transition:background .25s;
+}
+.cell.mode-yt     .cell-foot { background:linear-gradient(90deg,transparent,var(--orange),transparent); }
+.cell.mode-vimeo  .cell-foot { background:linear-gradient(90deg,transparent,var(--purple),transparent); }
+.cell.mode-dm     .cell-foot { background:linear-gradient(90deg,transparent,var(--yellow),transparent); }
+.cell.mode-rumble .cell-foot { background:linear-gradient(90deg,transparent,var(--green), transparent); }
+.cell.mode-twitch .cell-foot { background:linear-gradient(90deg,transparent,var(--purple),transparent); }
+.cell.mode-web    .cell-foot { background:linear-gradient(90deg,transparent,var(--cyan),  transparent); }
+
+/* ── CELL HEADER ── */
+.cell-hdr {
+  height:var(--hdr); min-height:var(--hdr);
+  background:linear-gradient(180deg,#0c1a28 0%,var(--panel2) 100%);
+  border-bottom:1px solid var(--border2);
+  display:flex; align-items:center;
+  padding:0 10px; gap:7px;
+  z-index:10; margin-top:2px; flex-shrink:0;
+}
+
+.ch-tag {
+  font-family:'Orbitron',sans-serif; font-weight:700;
+  font-size:10px; letter-spacing:.12em;
+  padding:4px 8px; border-radius:2px;
+  flex-shrink:0; min-width:34px; text-align:center;
+  background:var(--dim); color:var(--bg);
+  transition:all .2s;
+}
+.cell.mode-yt     .ch-tag { background:var(--orange); color:#000; }
+.cell.mode-vimeo  .ch-tag { background:var(--purple); color:#fff; }
+.cell.mode-dm     .ch-tag { background:var(--yellow); color:#000; }
+.cell.mode-rumble .ch-tag { background:var(--green);  color:#000; }
+.cell.mode-twitch .ch-tag { background:var(--purple); color:#fff; }
+.cell.mode-web    .ch-tag { background:var(--cyan);   color:var(--bg); box-shadow:var(--glow-c); }
+
+.mode-lbl {
+  font-family:'Orbitron',sans-serif; font-weight:600;
+  font-size:8px; letter-spacing:.12em; color:var(--dim);
+  flex-shrink:0; min-width:48px; transition:color .2s;
+}
+.cell.mode-yt     .mode-lbl { color:var(--orange); }
+.cell.mode-vimeo  .mode-lbl { color:var(--purple); }
+.cell.mode-dm     .mode-lbl { color:var(--yellow); }
+.cell.mode-rumble .mode-lbl { color:var(--green); }
+.cell.mode-twitch .mode-lbl { color:var(--purple); }
+.cell.mode-web    .mode-lbl { color:var(--cyan); }
+
+.url-field {
+  flex:1; min-width:0; height:36px;
+  background:rgba(0,229,255,.04); border:1px solid var(--border2);
+  outline:none; color:var(--text);
+  font-family:'Share Tech Mono',monospace; font-size:12px;
+  padding:0 12px; border-radius:3px;
+  transition:border-color .15s, box-shadow .15s;
+}
+.url-field:focus {
+  border-color:var(--cyan);
+  box-shadow:0 0 0 1px rgba(0,229,255,.18), inset 0 0 8px rgba(0,229,255,.04);
+}
+.url-field::placeholder { color:var(--dim); font-size:11px; }
+
+.go-btn {
+  height:36px; padding:0 16px; flex-shrink:0;
+  background:var(--cyan); border:none; color:var(--bg);
+  font-family:'Orbitron',sans-serif; font-size:11px; font-weight:700;
+  letter-spacing:.14em; border-radius:3px; cursor:pointer;
+  box-shadow:0 0 14px rgba(0,229,255,.4);
+  transition:all .15s; position:relative; overflow:hidden;
+}
+.go-btn::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(180deg,rgba(255,255,255,.14),transparent);
+}
+.go-btn:hover { background:#33ecff; box-shadow:0 0 22px rgba(0,229,255,.65); transform:translateY(-1px); }
+.go-btn:active { transform:none; }
+
+.hdr-btns { display:flex; gap:5px; flex-shrink:0; }
+.ic {
+  width:36px; height:36px;
+  background:var(--panel2); border:1px solid var(--border2);
+  color:var(--dim); font-size:14px; border-radius:3px;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:all .15s; flex-shrink:0;
+}
+.ic:hover { border-color:var(--cyan); color:var(--cyan); box-shadow:0 0 10px rgba(0,229,255,.2); }
+.ic.muted { border-color:var(--orange); color:var(--orange); }
+
+/* ── CELL BODY ── */
+.cell-body { flex:1; position:relative; overflow:hidden; background:#000; }
+
+.yt-target   { position:absolute; inset:0; width:100%; height:100%; z-index:1; }
+
+.embed-frame {
+  position:absolute; inset:0; width:100%; height:100%;
+  border:none; display:none; z-index:1;
+}
+.embed-frame.show { display:block; }
+
+.web-frame {
+  position:absolute; inset:0; width:100%; height:100%;
+  border:none; display:none; background:#fff; z-index:1;
+}
+.web-frame.show { display:block; }
+
+/* spinner */
+.spinner {
+  position:absolute; inset:0; display:none;
+  flex-direction:column; align-items:center; justify-content:center; gap:14px;
+  background:var(--panel); z-index:8;
+}
+.spinner.show { display:flex; }
+.spin-ring {
+  width:40px; height:40px; border-radius:50%;
+  border:2px solid var(--border2); border-top-color:var(--cyan);
+  animation:spin .8s linear infinite;
+  box-shadow:0 0 16px rgba(0,229,255,.3);
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+.spin-lbl {
+  font-family:'Orbitron',sans-serif; font-size:9px;
+  letter-spacing:.2em; color:var(--dim);
+  animation:fade 1.2s ease-in-out infinite;
+}
+@keyframes fade { 0%,100%{opacity:.4} 50%{opacity:1} }
+
+/* drop zone */
+.drop-zone {
+  position:absolute; inset:0; display:flex;
+  align-items:stretch; justify-content:stretch;
+  background:var(--panel); z-index:5;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size:40px 40px;
+}
+.drop-zone.gone { display:none; }
+
+/* two-column grid inside drop zone */
+.dz-grid {
+  display:grid; grid-template-columns:1fr 1fr;
+  width:100%; height:100%;
+  gap:0;
+}
+
+/* left: instructions */
+.dz-instructions {
+  display:flex; flex-direction:column; justify-content:center;
+  padding:20px 18px 20px 22px;
+  border-right:1px solid var(--border2);
+  gap:10px;
+  overflow:hidden;
+}
+.dz-ch {
+  font-family:'Orbitron',sans-serif; font-weight:900;
+  font-size:52px; line-height:1; color:var(--cyan);
+  opacity:.06; pointer-events:none; margin-bottom:-4px;
+}
+.dz-title {
+  font-family:'Orbitron',sans-serif; font-weight:700;
+  font-size:11px; letter-spacing:.18em; color:var(--cyan);
+  text-shadow:var(--glow-c);
+}
+.dz-subtitle {
+  font-size:10px; color:var(--dim); letter-spacing:.04em;
+  line-height:1.6;
+}
+.dz-formats { display:flex; flex-direction:column; gap:5px; }
+.dz-fmt-row {
+  display:flex; align-items:center; gap:7px;
+}
+.fmt-tag {
+  font-family:'Orbitron',sans-serif; font-weight:700;
+  font-size:7px; letter-spacing:.1em;
+  padding:2px 5px; border-radius:2px; flex-shrink:0;
+  min-width:28px; text-align:center;
+}
+.fmt-tag.yt  { background:var(--orange);  color:#000; }
+.fmt-tag.vim { background:var(--purple);  color:#fff; }
+.fmt-tag.dm  { background:var(--yellow);  color:#000; }
+.fmt-tag.rum { background:var(--green);   color:#000; }
+.fmt-tag.twt { background:#9147ff;        color:#fff; }
+.fmt-tag.web { background:var(--cyan);    color:var(--bg); }
+.fmt-txt {
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px; color:var(--dim); letter-spacing:.03em;
+}
+
+/* right: YouTube picks */
+.dz-picks {
+  display:flex; flex-direction:column;
+  padding:16px 14px; gap:6px; overflow-y:auto;
+}
+.dz-picks-title {
+  font-family:'Orbitron',sans-serif; font-weight:700;
+  font-size:8px; letter-spacing:.2em; color:var(--dim);
+  padding-bottom:6px; border-bottom:1px solid var(--border2);
+  margin-bottom:2px;
+}
+.qp {
+  background:var(--panel2); border:1px solid var(--border2);
+  color:var(--dim); font-family:'Share Tech Mono',monospace;
+  font-size:10px; padding:7px 10px; border-radius:2px;
+  cursor:pointer; white-space:nowrap; transition:all .15s;
+  letter-spacing:.04em; text-align:left; width:100%;
+}
+.qp:hover     { border-color:var(--cyan);   color:var(--cyan);   background:var(--cyan-dim); }
+.qp.yt:hover  { border-color:var(--orange); color:var(--orange); background:var(--orange-d); }
+
+/* error overlay */
+.err-overlay {
+  position:absolute; inset:0; display:none;
+  flex-direction:column; align-items:center; justify-content:center; gap:12px;
+  background:rgba(2,4,8,.95); z-index:9; padding:24px; text-align:center;
+}
+.err-overlay.show { display:flex; }
+.err-icon  { font-size:32px; opacity:.4; }
+.err-title {
+  font-family:'Orbitron',sans-serif; font-size:13px; font-weight:700;
+  color:var(--red); letter-spacing:.1em; text-transform:uppercase;
+}
+.err-sub   { font-size:11px; color:var(--dim); line-height:1.9; max-width:290px; }
+.err-open  {
+  height:38px; padding:0 18px; background:transparent;
+  border:1px solid var(--orange); color:var(--orange);
+  font-family:'Orbitron',sans-serif; font-size:9px; font-weight:600;
+  letter-spacing:.12em; border-radius:3px; cursor:pointer; margin-top:4px;
+  transition:all .2s;
+}
+.err-open:hover { background:var(--orange-d); box-shadow:var(--glow-o); }
+
+/* hover overlay */
+.cell-ov {
+  position:absolute; bottom:10px; right:10px;
+  display:flex; gap:6px; opacity:0; transition:opacity .2s; z-index:20;
+}
+.cell:hover .cell-ov { opacity:1; }
+.ov-b {
+  height:32px; padding:0 12px;
+  background:rgba(6,13,20,.92); border:1px solid var(--border2);
+  color:var(--dim); font-family:'Orbitron',sans-serif;
+  font-size:8px; font-weight:600; letter-spacing:.12em;
+  border-radius:3px; cursor:pointer;
+  backdrop-filter:blur(8px); transition:all .15s;
+}
+.ov-b:hover { border-color:var(--cyan); color:var(--cyan); box-shadow:0 0 10px rgba(0,229,255,.2); }
+</style>
+</head>
+<body>
+
+<!-- ══ TOPBAR ══ -->
+<div id="topbar">
+  <div id="logo">
+    <div id="logo-main">PODQUAD</div>
+    <div id="logo-sub">// MULTI-SOURCE COMMAND CENTER</div>
+  </div>
+
+  <div id="live-badge">
+    <div class="live-dot"></div>
+    <div id="live-label">LIVE</div>
+  </div>
+
+  <div class="sep"></div>
+
+  <div id="layout-bar">
+    <div class="ly li-quad on" title="2×2 Grid" onclick="setLayout('quad',this)">
+      <div class="s"></div><div class="s"></div>
+      <div class="s"></div><div class="s"></div>
+    </div>
+    <div class="ly li-pip" title="Focus + Side" onclick="setLayout('pip',this)">
+      <div class="s"></div><div class="s"></div><div class="s"></div>
+    </div>
+    <div class="ly li-full" title="Solo" onclick="setLayout('full',this)">
+      <div class="s"></div>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+
+  <button class="tb" onclick="pauseAll()">⏸ PAUSE ALL</button>
+  <button class="tb" onclick="playAll()">▶ PLAY ALL</button>
+  <button class="tb" onclick="reloadAll()">↺ RELOAD</button>
+  <button class="tb warn" onclick="clearAll()">✕ CLEAR ALL</button>
+
+  <div id="clock-wrap">
+    <div id="clock-time">00:00:00</div>
+    <div id="clock-date">INITIALIZING…</div>
+  </div>
+</div>
+
+<!-- ══ GRID ══ -->
+<div id="grid"></div>
+
+<script>
+// ══════════════════════════════════════════════
+//  CONSTANTS
+// ══════════════════════════════════════════════
+
+// Hostname used for Twitch parent param — update if you change hosting
+const HOST = window.location.hostname || 'davidfliesen.github.io';
+
+// YouTube quick-picks — 24/7 live streams, embedding always enabled
+const YT_QP = [
+  { label:'LOFI GIRL',  id:'jfKfPfyJRdk', note:'24/7 chill beats'   },
+  { label:'NASA TV',    id:'nA9UZF-SZoQ', note:'NASA official'       },
+  { label:'ISS EARTH',  id:'86YLFOog4GM', note:'Live from orbit'     },
+  { label:'SKY NEWS',   id:'9Auq9mYxFEE', note:'24/7 live news'      },
+  { label:'DW NEWS',    id:'mGHlf43XSRE', note:'24/7 live news'      },
+  { label:'EURONEWS',   id:'l8PMl7tUDIE', note:'24/7 live news'      },
+  { label:'DEEP OCEAN', id:'BHACKCNDMW8', note:'Ambient underwater'  },
+  { label:'JAZZ CAFE',  id:'NEuZxGSl8DQ', note:'24/7 jazz stream'    },
+];
+
+const CELLS = 4;
+let players = new Array(CELLS).fill(null);
+let ytReady = false;
+let pending = {};
+let layout  = 'quad';
+
+let S = Array.from({length:CELLS}, (_,i) => ({
+  mode:'empty', videoId:'', webUrl:'',
+  muted:false, focused:i===0, errUrl:''
+}));
+
+// ══════════════════════════════════════════════
+//  CLOCK
+// ══════════════════════════════════════════════
+function tickClock() {
+  const n = new Date();
+  document.getElementById('clock-time').textContent =
+    n.toTimeString().slice(0,8);
+  document.getElementById('clock-date').textContent =
+    n.toLocaleDateString('en-US',{weekday:'short',year:'numeric',month:'short',day:'numeric'}).toUpperCase();
+}
+setInterval(tickClock,1000);
+tickClock();
+
+// ══════════════════════════════════════════════
+//  URL DETECTION
+// ══════════════════════════════════════════════
+function detect(raw) {
+  const s = raw.trim();
+  if (/youtu\.be\/|youtube\.com/i.test(s))        return 'yt';
+  if (/vimeo\.com/i.test(s))                       return 'vimeo';
+  if (/dailymotion\.com/i.test(s))                 return 'dm';
+  if (/rumble\.com\/embed/i.test(s))               return 'rumble';
+  if (/rumble\.com\/v/i.test(s))                   return 'rumble';
+  if (/twitch\.tv/i.test(s))                       return 'twitch';
+  if (/player\.twitch\.tv/i.test(s))               return 'twitch';
+  if (/^[a-zA-Z0-9_-]{11}$/.test(s))              return 'yt';
+  return 'web';
+}
+
+function ytId(raw) {
+  const s = raw.trim(); let m;
+  m = s.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);   if(m) return m[1];
+  m = s.match(/[?&]v=([a-zA-Z0-9_-]{11})/);        if(m) return m[1];
+  m = s.match(/\/embed\/([a-zA-Z0-9_-]{11})/);     if(m) return m[1];
+  m = s.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);    if(m) return m[1];
+  if(/^[a-zA-Z0-9_-]{11}$/.test(s)) return s;
+  return null;
+}
+
+function vimeoId(raw) {
+  const m = raw.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+  return m ? m[1] : null;
+}
+
+function dmId(raw) {
+  const m = raw.match(/dailymotion\.com\/(?:video\/|embed\/video\/)?([a-zA-Z0-9]+)/);
+  return m ? m[1] : null;
+}
+
+function rumbleSlug(raw) {
+  // rumble.com/embed/SLUG/ or rumble.com/vSLUG
+  let m = raw.match(/rumble\.com\/embed\/([a-zA-Z0-9]+)/);
+  if(m) return m[1];
+  m = raw.match(/rumble\.com\/(v[a-zA-Z0-9]+)/);
+  if(m) return m[1];
+  return null;
+}
+
+function twitchChannel(raw) {
+  let m = raw.match(/twitch\.tv\/([a-zA-Z0-9_]+)/);
+  if(m && m[1] !== 'videos' && m[1] !== 'clip') return { type:'channel', val:m[1] };
+  m = raw.match(/[?&]channel=([a-zA-Z0-9_]+)/);
+  if(m) return { type:'channel', val:m[1] };
+  m = raw.match(/[?&]clip=([a-zA-Z0-9_-]+)/);
+  if(m) return { type:'clip', val:m[1] };
+  m = raw.match(/twitch\.tv\/clip\/([a-zA-Z0-9_-]+)/);
+  if(m) return { type:'clip', val:m[1] };
+  return null;
+}
+
+function normalizeUrl(raw) {
+  const s = raw.trim();
+  if(!s) return '';
+  if(/^https?:\/\//i.test(s)) return s;
+  if(/^[\w-]+\.[a-z]{2,}/i.test(s)) return 'https://'+s;
+  return 'https://www.google.com/search?q='+encodeURIComponent(s);
+}
+
+// ══════════════════════════════════════════════
+//  BUILD GRID
+// ══════════════════════════════════════════════
+function buildGrid() {
+  const g = document.getElementById('grid');
+  g.innerHTML = '';
+  for(let i=0;i<CELLS;i++){
+    const c = document.createElement('div');
+    c.id = `cell-${i}`;
+    c.className = 'cell'+(S[i].focused?' focused':'');
+    c.innerHTML = cellHTML(i);
+    g.appendChild(c);
+  }
+}
+
+function cellHTML(i) {
+  const ytBtns = YT_QP.map(q=>
+    `<button class="qp yt" onclick="event.stopPropagation();loadYT(${i},'${q.id}')" title="${q.note}">${q.label}</button>`
+  ).join('');
+
+  return `
+    <div class="mode-stripe"></div>
+    <div class="cell-hdr" onclick="event.stopPropagation()">
+      <span class="ch-tag" id="chtag-${i}">CH${i+1}</span>
+      <span class="mode-lbl" id="modelbl-${i}">EMPTY</span>
+      <input class="url-field" id="url-${i}" type="url" inputmode="url"
+        placeholder="Paste a URL — YouTube, Vimeo, Dailymotion, Rumble, Twitch, or any website"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();goCell(${i})}">
+      <button class="go-btn" onclick="goCell(${i})">GO</button>
+      <div class="hdr-btns">
+        <button class="ic" id="mute-${i}" onclick="toggleMute(${i})" title="Mute/Unmute">🔊</button>
+        <button class="ic" onclick="focusCell(${i})" title="Focus pane">◉</button>
+        <button class="ic" onclick="clearCell(${i})" title="Clear pane">✕</button>
+      </div>
+    </div>
+    <div class="cell-body" id="body-${i}">
+      <div class="spinner" id="spin-${i}">
+        <div class="spin-ring"></div>
+        <div class="spin-lbl">ACQUIRING SIGNAL…</div>
+      </div>
+      <div class="yt-target" id="yt-${i}"></div>
+      <iframe class="embed-frame" id="embed-${i}" allowfullscreen
+        allow="autoplay; fullscreen; picture-in-picture"
+        referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <iframe class="web-frame" id="web-${i}" referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+      <div class="drop-zone" id="dz-${i}">
+        <div class="dz-grid">
+
+          <!-- LEFT: how-to instructions -->
+          <div class="dz-instructions">
+            <div class="dz-ch">CH${i+1}</div>
+            <div class="dz-title">AWAITING SIGNAL</div>
+            <div class="dz-subtitle">Paste any URL above and tap GO, or pick a live stream below</div>
+            <div class="dz-formats">
+              <div class="dz-fmt-row"><span class="fmt-tag yt">YT</span><span class="fmt-txt">youtube.com/watch?v=… · youtu.be/…</span></div>
+              <div class="dz-fmt-row"><span class="fmt-tag vim">VIM</span><span class="fmt-txt">vimeo.com/123456</span></div>
+              <div class="dz-fmt-row"><span class="fmt-tag dm">DM</span><span class="fmt-txt">dailymotion.com/video/…</span></div>
+              <div class="dz-fmt-row"><span class="fmt-tag rum">RUM</span><span class="fmt-txt">rumble.com/v… or rumble.com/embed/…</span></div>
+              <div class="dz-fmt-row"><span class="fmt-tag twt">TWI</span><span class="fmt-txt">twitch.tv/channelname</span></div>
+              <div class="dz-fmt-row"><span class="fmt-tag web">WEB</span><span class="fmt-txt">Any embeddable website URL</span></div>
+            </div>
+          </div>
+
+          <!-- RIGHT: YouTube quick-picks -->
+          <div class="dz-picks">
+            <div class="dz-picks-title">▶ LIVE STREAMS</div>
+            ${ytBtns}
+          </div>
+
+        </div>
+      </div>
+
+      <div class="err-overlay" id="err-${i}">
+        <div class="err-icon">⚠</div>
+        <div class="err-title" id="errtitle-${i}">SIGNAL LOST</div>
+        <div class="err-sub"   id="errsub-${i}"></div>
+        <button class="err-open" id="erropen-${i}" onclick="openTab(${i})" style="display:none">
+          OPEN IN NEW TAB ↗
+        </button>
+      </div>
+    </div>
+    <div class="cell-bl"></div><div class="cell-br"></div>
+    <div class="cell-ov">
+      <button class="ov-b" onclick="focusCell(${i})">FOCUS</button>
+      <button class="ov-b" onclick="clearCell(${i})">CLEAR</button>
+    </div>
+    <div class="cell-foot"></div>`;
+}
+
+// ══════════════════════════════════════════════
+//  GO — smart auto-router
+// ══════════════════════════════════════════════
+function goCell(i) {
+  const raw = document.getElementById(`url-${i}`).value.trim();
+  if(!raw) return;
+
+  const type = detect(raw);
+
+  if(type==='yt') {
+    const id = ytId(raw);
+    if(id){ loadYT(i,id); return; }
+    showErr(i,'INVALID YOUTUBE URL','Could not find a video ID in that link.',false);
+    return;
+  }
+  if(type==='vimeo') {
+    const id = vimeoId(raw);
+    if(id){ loadVimeo(i,id); return; }
+    showErr(i,'INVALID VIMEO URL','Could not find a Vimeo video ID.',false);
+    return;
+  }
+  if(type==='dm') {
+    const id = dmId(raw);
+    if(id){ loadDM(i,id); return; }
+    showErr(i,'INVALID DAILYMOTION URL','Could not find a Dailymotion video ID.',false);
+    return;
+  }
+  if(type==='rumble') {
+    const slug = rumbleSlug(raw);
+    if(slug){ loadRumble(i,slug); return; }
+    showErr(i,'INVALID RUMBLE URL','Could not find a Rumble video slug.',false);
+    return;
+  }
+  if(type==='twitch') {
+    const t = twitchChannel(raw);
+    if(t){ loadTwitch(i,t.type,t.val); return; }
+    showErr(i,'INVALID TWITCH URL','Could not find a Twitch channel or clip.',false);
+    return;
+  }
+  loadWeb(i, normalizeUrl(raw));
+}
+
+// ══════════════════════════════════════════════
+//  YOUTUBE — IFrame JS API
+// ══════════════════════════════════════════════
+function loadYT(i, vid) {
+  setMode(i,'yt');
+  S[i].videoId = vid;
+  S[i].errUrl  = `https://www.youtube.com/watch?v=${vid}`;
+  document.getElementById(`url-${i}`).value = `https://youtu.be/${vid}`;
+  hideErr(i); hideDZ(i); showSpin(i); focusCell(i);
+  hideEmbed(i); hideWeb(i);
+  if(!ytReady){ pending[i]=vid; return; }
+  _ytInit(i,vid);
+}
+
+function _ytInit(i,vid) {
+  if(players[i]) {
+    players[i].loadVideoById(vid);
+  } else {
+    players[i] = new YT.Player(`yt-${i}`,{
+      videoId: vid,
+      playerVars:{
+        autoplay:1, mute:S[i].muted?1:0,
+        controls:1, rel:0, enablejsapi:1,
+        origin: window.location.origin||`https://${HOST}`,
+        playsinline:1,
+      },
+      events:{
+        onReady: e => { hideSpin(i); if(S[i].muted)e.target.mute(); e.target.playVideo(); },
+        onStateChange: e => {
+          if(e.data===YT.PlayerState.PLAYING)  hideSpin(i);
+          if(e.data===YT.PlayerState.BUFFERING) showSpin(i);
+        },
+        onError: e => {
+          hideSpin(i);
+          const m={2:'Invalid video ID.',5:'Cannot play in HTML5 player.',
+            100:'Video not found or is private.',
+            101:'The video owner has disabled embedded playback.',
+            150:'The video owner has disabled embedded playback.'};
+          showErr(i,'TRANSMISSION ERROR',
+            m[e.data]||`YouTube error code ${e.data}.`,
+            true, `https://www.youtube.com/watch?v=${vid}`);
+        },
+      },
+    });
+  }
+}
+
+window.onYouTubeIframeAPIReady = function() {
+  ytReady = true;
+  for(const [idx,vid] of Object.entries(pending)) _ytInit(parseInt(idx),vid);
+  pending = {};
+};
+
+// ══════════════════════════════════════════════
+//  VIMEO
+// ══════════════════════════════════════════════
+function loadVimeo(i,vid) {
+  setMode(i,'vimeo');
+  S[i].videoId=vid; S[i].errUrl=`https://vimeo.com/${vid}`;
+  document.getElementById(`url-${i}`).value=`https://vimeo.com/${vid}`;
+  hideErr(i); hideDZ(i); showSpin(i); focusCell(i);
+  hideWeb(i); pauseYT(i);
+  const ef=document.getElementById(`embed-${i}`);
+  ef.onload=()=>hideSpin(i);
+  ef.onerror=()=>showErr(i,'VIMEO ERROR','Could not load this Vimeo video.',true,S[i].errUrl);
+  ef.src=`https://player.vimeo.com/video/${vid}?autoplay=1&title=0&byline=0&portrait=0`;
+  ef.classList.add('show');
+}
+
+// ══════════════════════════════════════════════
+//  DAILYMOTION
+// ══════════════════════════════════════════════
+function loadDM(i,vid) {
+  setMode(i,'dm');
+  S[i].videoId=vid; S[i].errUrl=`https://www.dailymotion.com/video/${vid}`;
+  document.getElementById(`url-${i}`).value=`https://www.dailymotion.com/video/${vid}`;
+  hideErr(i); hideDZ(i); showSpin(i); focusCell(i);
+  hideWeb(i); pauseYT(i);
+  const ef=document.getElementById(`embed-${i}`);
+  ef.onload=()=>hideSpin(i);
+  ef.onerror=()=>showErr(i,'DAILYMOTION ERROR','Could not load this video.',true,S[i].errUrl);
+  ef.src=`https://www.dailymotion.com/embed/video/${vid}?autoplay=1&mute=0`;
+  ef.classList.add('show');
+}
+
+// ══════════════════════════════════════════════
+//  RUMBLE
+// ══════════════════════════════════════════════
+function loadRumble(i,slug) {
+  setMode(i,'rumble');
+  S[i].videoId=slug; S[i].errUrl=`https://rumble.com/${slug}`;
+  document.getElementById(`url-${i}`).value=`https://rumble.com/embed/${slug}/`;
+  hideErr(i); hideDZ(i); showSpin(i); focusCell(i);
+  hideWeb(i); pauseYT(i);
+  const ef=document.getElementById(`embed-${i}`);
+  ef.onload=()=>hideSpin(i);
+  ef.onerror=()=>showErr(i,'RUMBLE ERROR','Could not load this Rumble video.',true,S[i].errUrl);
+  ef.src=`https://rumble.com/embed/${slug}/?pub=4`;
+  ef.classList.add('show');
+}
+
+// ══════════════════════════════════════════════
+//  TWITCH — requires parent hostname parameter
+// ══════════════════════════════════════════════
+function loadTwitch(i,type,val) {
+  setMode(i,'twitch');
+  const url = type==='clip'
+    ? `https://clips.twitch.tv/embed?clip=${val}&parent=${HOST}&autoplay=true`
+    : `https://player.twitch.tv/?channel=${val}&parent=${HOST}&autoplay=true`;
+  S[i].videoId=val; S[i].errUrl=`https://www.twitch.tv/${val}`;
+  document.getElementById(`url-${i}`).value=`https://www.twitch.tv/${val}`;
+  hideErr(i); hideDZ(i); showSpin(i); focusCell(i);
+  hideWeb(i); pauseYT(i);
+  const ef=document.getElementById(`embed-${i}`);
+  ef.onload=()=>hideSpin(i);
+  ef.onerror=()=>showErr(i,'TWITCH ERROR',
+    'Could not load this Twitch stream. The channel may be offline.',true,S[i].errUrl);
+  ef.src=url;
+  ef.classList.add('show');
+}
+
+// ══════════════════════════════════════════════
+//  WEB
+// ══════════════════════════════════════════════
+function loadWeb(i,url) {
+  if(!url) return;
+  setMode(i,'web');
+  S[i].webUrl=url; S[i].errUrl=url;
+  document.getElementById(`url-${i}`).value=url;
+  hideErr(i); hideDZ(i); showSpin(i); focusCell(i);
+  hideEmbed(i); pauseYT(i);
+  const wf=document.getElementById(`web-${i}`);
+  // No sandbox — it prevents sites loading their own scripts/styles.
+  // X-Frame-Options on the target site handles blocking at the browser level.
+  wf.removeAttribute('sandbox');
+  wf.onload  = ()=>onWebLoad(i);
+  wf.onerror = ()=>onWebErr(i);
+  wf.classList.add('show');
+  wf.src=url;
+}
+
+function onWebLoad(i) {
+  if(S[i].mode!=='web') return;
+  hideSpin(i);
+  try {
+    const doc=document.getElementById(`web-${i}`).contentDocument;
+    if(doc&&doc.body&&doc.body.innerHTML==='') onWebErr(i);
+  } catch(e){/* cross-origin = loaded fine */}
+}
+
+function onWebErr(i) {
+  if(S[i].mode!=='web') return;
+  hideSpin(i);
+  showErr(i,'SIGNAL BLOCKED',
+    'This site blocks embedded display (X-Frame-Options / CSP). Many major news networks and social media sites do not allow iframe embedding by design.',
+    true, S[i].errUrl);
+}
+
+// ══════════════════════════════════════════════
+//  CONTROLS
+// ══════════════════════════════════════════════
+function setMode(i,mode) {
+  S[i].mode=mode;
+  const cell=document.getElementById(`cell-${i}`);
+  cell.className=cell.className.replace(/\bmode-\S+/g,'').trim();
+  if(mode!=='empty') cell.classList.add(`mode-${mode}`);
+  const L={yt:'YOUTUBE',vimeo:'VIMEO',dm:'DAILYMOTION',
+           rumble:'RUMBLE',twitch:'TWITCH',web:'WEB',empty:'EMPTY'};
+  document.getElementById(`modelbl-${i}`).textContent=L[mode]||'EMPTY';
+}
+
+function pauseYT(i) {
+  if(players[i]) try{players[i].pauseVideo();}catch(e){}
+}
+
+function toggleMute(i) {
+  S[i].muted=!S[i].muted;
+  const btn=document.getElementById(`mute-${i}`);
+  if(btn){btn.textContent=S[i].muted?'🔇':'🔊';btn.classList.toggle('muted',S[i].muted);}
+  if(players[i]&&S[i].mode==='yt') S[i].muted?players[i].mute():players[i].unMute();
+}
+
+function focusCell(i) {
+  S.forEach((s,j)=>s.focused=j===i);
+  document.querySelectorAll('.cell').forEach((c,j)=>c.classList.toggle('focused',j===i));
+  if(layout==='full') applyLayout();
+}
+
+function clearContent(i) {
+  if(players[i]){try{players[i].stopVideo();players[i].destroy();}catch(e){}players[i]=null;}
+  // Rebuild yt-target div (YT API replaces it with its own iframe)
+  const body=document.getElementById(`body-${i}`);
+  let yt=document.getElementById(`yt-${i}`);
+  if(!yt){
+    yt=document.createElement('div');
+    yt.id=`yt-${i}`; yt.className='yt-target';
+    const spin=document.getElementById(`spin-${i}`);
+    spin?spin.after(yt):body.prepend(yt);
+  }
+  hideEmbed(i); hideWeb(i);
+  S[i].videoId=''; S[i].webUrl='';
+  setMode(i,'empty');
+  hideErr(i); showDZ(i); hideSpin(i);
+}
+
+function clearCell(i) {
+  document.getElementById(`url-${i}`).value='';
+  clearContent(i);
+}
+
+function hideEmbed(i) {
+  const ef=document.getElementById(`embed-${i}`);
+  if(ef){ef.classList.remove('show');ef.src='';ef.onload=null;ef.onerror=null;}
+}
+function hideWeb(i) {
+  const wf=document.getElementById(`web-${i}`);
+  if(wf){wf.classList.remove('show');wf.src='';wf.onload=null;wf.onerror=null;}
+}
+function openTab(i) { if(S[i].errUrl) window.open(S[i].errUrl,'_blank'); }
+
+function pauseAll()  { players.forEach(p=>p&&p.pauseVideo()); }
+function playAll()   { players.forEach(p=>p&&p.playVideo()); }
+function reloadAll() {
+  for(let i=0;i<CELLS;i++){
+    const s=S[i];
+    if     (s.mode==='yt'     &&s.videoId&&players[i]) players[i].loadVideoById(s.videoId);
+    else if(s.mode==='vimeo'  &&s.videoId) loadVimeo(i,s.videoId);
+    else if(s.mode==='dm'     &&s.videoId) loadDM(i,s.videoId);
+    else if(s.mode==='rumble' &&s.videoId) loadRumble(i,s.videoId);
+    else if(s.mode==='twitch' &&s.videoId) loadTwitch(i,'channel',s.videoId);
+    else if(s.mode==='web'    &&s.webUrl)  loadWeb(i,s.webUrl);
+  }
+}
+function clearAll() { for(let i=0;i<CELLS;i++) clearCell(i); }
+
+// ══════════════════════════════════════════════
+//  LAYOUT
+// ══════════════════════════════════════════════
+function setLayout(name,el) {
+  layout=name;
+  document.querySelectorAll('.ly').forEach(b=>b.classList.remove('on'));
+  if(el) el.classList.add('on');
+  applyLayout();
+}
+function applyLayout() {
+  const g=document.getElementById('grid');
+  g.className='';
+  if(layout==='pip')  g.classList.add('l-pip');
+  if(layout==='full'){
+    g.classList.add('l-full');
+    document.querySelectorAll('.cell').forEach((c,i)=>c.classList.toggle('focused',S[i].focused));
+  }
+}
+
+// ══════════════════════════════════════════════
+//  UI HELPERS
+// ══════════════════════════════════════════════
+const $  = id => document.getElementById(id);
+function showDZ(i)   { $(`dz-${i}`)?.classList.remove('gone'); }
+function hideDZ(i)   { $(`dz-${i}`)?.classList.add('gone'); }
+function showSpin(i) { $(`spin-${i}`)?.classList.add('show'); }
+function hideSpin(i) { $(`spin-${i}`)?.classList.remove('show'); }
+
+function showErr(i,title,sub,showOpen,url) {
+  $(`errtitle-${i}`).textContent = title;
+  $(`errsub-${i}`).textContent   = sub;
+  const btn = $(`erropen-${i}`);
+  if(btn){ btn.style.display=showOpen?'inline-block':'none'; if(url) S[i].errUrl=url; }
+  $(`err-${i}`).classList.add('show');
+  hideSpin(i);
+}
+function hideErr(i) { $(`err-${i}`)?.classList.remove('show'); }
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+buildGrid();
+
+(function(){
+  const t=document.createElement('script');
+  t.src='https://www.youtube.com/iframe_api';
+  t.async=true;
+  document.head.appendChild(t);
+})();
+</script>
+</body>
+</html>

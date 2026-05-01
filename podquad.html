@@ -438,50 +438,67 @@ body::after {
 }
 .dz-ch {
   font-family:'Orbitron',sans-serif; font-weight:900;
-  font-size:52px; line-height:1; color:var(--cyan);
+  font-size:56px; line-height:1; color:var(--cyan);
   opacity:.06; pointer-events:none; margin-bottom:-4px;
 }
 .dz-title {
   font-family:'Orbitron',sans-serif; font-weight:700;
-  font-size:11px; letter-spacing:.18em; color:var(--cyan);
+  font-size:16px; letter-spacing:.15em; color:var(--cyan);
   text-shadow:var(--glow-c);
 }
 .dz-subtitle {
-  font-size:10px; color:var(--dim); letter-spacing:.04em;
-  line-height:1.6;
+  font-family:'Orbitron',sans-serif;
+  font-size:12px; color:var(--dim); letter-spacing:.08em;
+  line-height:1.7;
 }
-.dz-formats { display:flex; flex-direction:column; gap:5px; }
-.dz-fmt-row {
-  display:flex; align-items:center; gap:7px;
-}
-.fmt-tag {
-  font-family:'Orbitron',sans-serif; font-weight:700;
-  font-size:7px; letter-spacing:.1em;
-  padding:2px 5px; border-radius:2px; flex-shrink:0;
-  min-width:28px; text-align:center;
-}
-.fmt-tag.yt  { background:var(--orange);  color:#000; }
-.fmt-tag.vim { background:var(--purple);  color:#fff; }
-.fmt-tag.dm  { background:var(--yellow);  color:#000; }
-.fmt-tag.rum { background:var(--green);   color:#000; }
-.fmt-tag.twt { background:#9147ff;        color:#fff; }
-.fmt-tag.web { background:var(--cyan);    color:var(--bg); }
-.fmt-txt {
+.dz-note {
   font-family:'Share Tech Mono',monospace;
-  font-size:9px; color:var(--dim); letter-spacing:.03em;
+  font-size:11px; color:var(--dim); letter-spacing:.03em;
+  line-height:1.7; opacity:.85;
+  border-top:1px solid var(--border2);
+  padding-top:8px; margin-top:2px;
+}
+.dz-note-label {
+  font-family:'Orbitron',sans-serif; font-weight:700;
+  font-size:8px; letter-spacing:.12em;
+  color:var(--orange);
+}
+.dz-note em { font-style:normal; color:var(--text); }
+
+/* right panel — sources list */
+.dz-sources {
+  display:flex; flex-direction:column; gap:10px;
+}
+.dz-src {
+  display:flex; align-items:center; gap:12px;
+}
+.src-tag {
+  font-family:'Orbitron',sans-serif; font-weight:700;
+  font-size:10px; letter-spacing:.1em;
+  padding:5px 8px; border-radius:3px; flex-shrink:0;
+  min-width:42px; text-align:center;
+}
+.src-tag.yt  { background:var(--orange);  color:#000; }
+.src-tag.vim { background:var(--purple);  color:#fff; }
+.src-tag.dm  { background:var(--yellow);  color:#000; }
+.src-tag.rum { background:var(--green);   color:#000; }
+.src-tag.twt { background:#9147ff;        color:#fff; }
+.src-tag.web { background:var(--cyan);    color:var(--bg); }
+.src-name {
+  font-family:'Orbitron',sans-serif; font-weight:600;
+  font-size:13px; letter-spacing:.08em; color:var(--dim);
 }
 
 /* right: supported sources reference */
 .dz-ref {
   display:flex; flex-direction:column; justify-content:center;
   padding:20px 22px 20px 18px;
-  gap:12px;
-  overflow:hidden;
+  gap:14px; overflow:hidden;
 }
 .dz-ref-title {
   font-family:'Orbitron',sans-serif; font-weight:700;
-  font-size:9px; letter-spacing:.2em; color:var(--dim);
-  padding-bottom:8px; border-bottom:1px solid var(--border2);
+  font-size:10px; letter-spacing:.2em; color:var(--dim);
+  padding-bottom:10px; border-bottom:1px solid var(--border2);
 }
 
 /* error overlay */
@@ -720,18 +737,19 @@ function cellHTML(i) {
             <div class="dz-ch">CH${i+1}</div>
             <div class="dz-title">AWAITING SIGNAL</div>
             <div class="dz-subtitle">Paste any URL above and tap GO</div>
+            <div class="dz-note"><span class="dz-note-label">NOTE:</span> Many sites block iFrame embedding (including social media, TV networks, and streaming services).</div>
           </div>
 
-          <!-- RIGHT: supported URL format reference -->
+          <!-- RIGHT: supported sources — name + icon only, large and readable -->
           <div class="dz-ref">
             <div class="dz-ref-title">SUPPORTED SOURCES</div>
-            <div class="dz-formats">
-              <div class="dz-fmt-row"><span class="fmt-tag yt">YT</span><span class="fmt-txt">youtube.com/watch?v=… · youtu.be/…</span></div>
-              <div class="dz-fmt-row"><span class="fmt-tag vim">VIM</span><span class="fmt-txt">vimeo.com/123456</span></div>
-              <div class="dz-fmt-row"><span class="fmt-tag dm">DM</span><span class="fmt-txt">dailymotion.com/video/…</span></div>
-              <div class="dz-fmt-row"><span class="fmt-tag rum">RUM</span><span class="fmt-txt">rumble.com/v… · rumble.com/embed/…</span></div>
-              <div class="dz-fmt-row"><span class="fmt-tag twt">TWI</span><span class="fmt-txt">twitch.tv/channelname</span></div>
-              <div class="dz-fmt-row"><span class="fmt-tag web">WEB</span><span class="fmt-txt">Any embeddable website URL</span></div>
+            <div class="dz-sources">
+              <div class="dz-src"><span class="src-tag yt">YT</span><span class="src-name">YouTube</span></div>
+              <div class="dz-src"><span class="src-tag vim">VIM</span><span class="src-name">Vimeo</span></div>
+              <div class="dz-src"><span class="src-tag dm">DM</span><span class="src-name">Dailymotion</span></div>
+              <div class="dz-src"><span class="src-tag rum">RUM</span><span class="src-name">Rumble</span></div>
+              <div class="dz-src"><span class="src-tag twt">TWI</span><span class="src-name">Twitch</span></div>
+              <div class="dz-src"><span class="src-tag web">WEB</span><span class="src-name">Websites</span></div>
             </div>
           </div>
 

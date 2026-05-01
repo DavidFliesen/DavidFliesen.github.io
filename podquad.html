@@ -15,6 +15,24 @@
   ║                                                          ║
   ║  Built by David Fliesen / Cibola Studios                 ║
   ║  davidfliesen.github.io                                  ║
+  ║                                                          ║
+  ║  MIT License                                             ║
+  ║  Copyright (c) 2025 David Fliesen / Cibola Studios        ║
+  ║                                                          ║
+  ║  Permission is hereby granted, free of charge, to any   ║
+  ║  person obtaining a copy of this software to deal in     ║
+  ║  the Software without restriction, including without     ║
+  ║  limitation the rights to use, copy, modify, merge,      ║
+  ║  publish, distribute, sublicense, and/or sell copies,    ║
+  ║  and to permit persons to whom the Software is furnished ║
+  ║  to do so, subject to the following conditions:          ║
+  ║                                                          ║
+  ║  The above copyright notice and this permission notice   ║
+  ║  shall be included in all copies or substantial portions ║
+  ║  of the Software.                                        ║
+  ║                                                          ║
+  ║  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY      ║
+  ║  OF ANY KIND.                                            ║
   ╚══════════════════════════════════════════════════════════╝
 -->
 <head>
@@ -30,31 +48,25 @@
 ══════════════════════════════════════ */
 :root {
   --bg:       #020408;
-  --bg2:      #060d14;
   --panel:    #080f18;
   --panel2:   #0b1520;
   --border:   #0d2035;
   --border2:  #163050;
   --cyan:     #00e5ff;
   --cyan-dim: rgba(0,229,255,0.08);
-  --cyan-mid: rgba(0,229,255,0.2);
   --orange:   #ff6d00;
   --orange-d: rgba(255,109,0,0.15);
   --green:    #39ff14;
   --green-d:  rgba(57,255,20,0.1);
   --purple:   #d500f9;
-  --purple-d: rgba(213,0,249,0.12);
   --red:      #ff1744;
   --yellow:   #ffe600;
   --yellow-d: rgba(255,230,0,0.12);
-  --pink:     #ff4081;
-  --pink-d:   rgba(255,64,129,0.12);
   --text:     #c8e6f0;
   --dim:      #4a7a8a;
   --glow-c:   0 0 14px rgba(0,229,255,0.65), 0 0 32px rgba(0,229,255,0.2);
   --glow-o:   0 0 14px rgba(255,109,0,0.6);
   --glow-g:   0 0 14px rgba(57,255,20,0.5);
-  --gap:      8px;
   --bar:      52px;
   --hdr:      44px;
 }
@@ -265,7 +277,6 @@ body::after {
 .cell.mode-yt    .mode-stripe { background:var(--orange); box-shadow:var(--glow-o); }
 .cell.mode-vimeo .mode-stripe { background:var(--purple); }
 .cell.mode-dm    .mode-stripe { background:var(--yellow); }
-.cell.mode-rumble.mode-stripe,
 .cell.mode-rumble .mode-stripe { background:var(--green); box-shadow:var(--glow-g); }
 .cell.mode-twitch .mode-stripe { background:var(--purple); }
 .cell.mode-web   .mode-stripe { background:var(--cyan);   box-shadow:var(--glow-c); }
@@ -577,16 +588,17 @@ body::after {
 const HOST = window.location.hostname || 'davidfliesen.github.io';
 
 // YouTube quick-picks — verified 24/7 embeddable streams
+// Intentionally apolitical — ambient, music, and nature only
 // IDs last verified April 2025 — replace any that show TRANSMISSION ERROR
 const YT_QP = [
-  { label:'LOFI GIRL',   id:'jfKfPfyJRdk', note:'24/7 chill beats · Lofi Girl'          },
-  { label:'AL JAZEERA',  id:'gCNeDWCI0vo', note:'Al Jazeera English live news'           },
-  { label:'DW NEWS',     id:'LuKwFajn37U', note:'DW News 24/7 live stream'               },
-  { label:'EURONEWS',    id:'l8PMl7tUDIE', note:'Euronews 24/7 live'                     },
-  { label:'DEEP OCEAN',  id:'BHACKCNDMW8', note:'Ambient underwater footage'             },
-  { label:'COFFEE JAZZ', id:'fEvM-OUbaKs', note:'24/7 café jazz · BGM Channel'          },
-  { label:'PIANO JAZZ',  id:'Dx5qFachd3A', note:'24/7 relaxing jazz piano'               },
-  { label:'RAINY JAZZ',  id:'DSGyEsJ17cI', note:'24/7 rainy jazz & bossa nova'           },
+  { label:'LOFI GIRL',    id:'jfKfPfyJRdk', note:'24/7 chill lo-fi beats · Lofi Girl'    },
+  { label:'DEEP OCEAN',   id:'BHACKCNDMW8', note:'Ambient underwater footage'             },
+  { label:'COFFEE JAZZ',  id:'fEvM-OUbaKs', note:'24/7 café jazz · BGM Channel'          },
+  { label:'PIANO JAZZ',   id:'Dx5qFachd3A', note:'24/7 relaxing jazz piano'               },
+  { label:'RAINY JAZZ',   id:'DSGyEsJ17cI', note:'24/7 rainy jazz & bossa nova'           },
+  { label:'CHILLHOP',     id:'7NOSDKb0HlU', note:'24/7 chillhop music · Chillhop Music'  },
+  { label:'NATURE WALKS', id:'iGpGNzx2cg4', note:'4K nature & relaxation footage'         },
+  { label:'FIREPLACE',    id:'l3olfPZMBSk', note:'Cozy 4K fireplace · ambient sounds'     },
 ];
 
 const CELLS = 4;
@@ -597,7 +609,7 @@ let layout  = 'quad';
 
 let S = Array.from({length:CELLS}, (_,i) => ({
   mode:'empty', videoId:'', webUrl:'',
-  muted:false, focused:i===0, errUrl:''
+  muted:false, focused:i===0, errUrl:'', twitchType:'channel'
 }));
 
 // ══════════════════════════════════════════════
@@ -916,6 +928,7 @@ function loadRumble(i,slug) {
 // ══════════════════════════════════════════════
 function loadTwitch(i,type,val) {
   setMode(i,'twitch');
+  S[i].twitchType=type;
   const url = type==='clip'
     ? `https://clips.twitch.tv/embed?clip=${val}&parent=${HOST}&autoplay=true`
     : `https://player.twitch.tv/?channel=${val}&parent=${HOST}&autoplay=true`;
@@ -1039,7 +1052,7 @@ function reloadAll() {
     else if(s.mode==='vimeo'  &&s.videoId) loadVimeo(i,s.videoId);
     else if(s.mode==='dm'     &&s.videoId) loadDM(i,s.videoId);
     else if(s.mode==='rumble' &&s.videoId) loadRumble(i,s.videoId);
-    else if(s.mode==='twitch' &&s.videoId) loadTwitch(i,'channel',s.videoId);
+    else if(s.mode==='twitch' &&s.videoId) loadTwitch(i, s.twitchType||'channel', s.videoId);
     else if(s.mode==='web'    &&s.webUrl)  loadWeb(i,s.webUrl);
   }
 }
@@ -1094,7 +1107,7 @@ function toggleFullscreen() {
     const el = document.documentElement;
     if (el.requestFullscreen)       el.requestFullscreen();
     else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-    btn.textContent = '⛶';
+    btn.textContent = '⛿';
     btn.classList.add('active');
     btn.title = 'Exit Fullscreen';
   } else {
@@ -1115,6 +1128,7 @@ function syncFsBtn() {
   if (!btn) return;
   const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
   btn.classList.toggle('active', isFs);
+  btn.textContent = isFs ? '⛿' : '⛶';
   btn.title = isFs ? 'Exit Fullscreen' : 'Toggle Fullscreen';
 }
 

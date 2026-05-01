@@ -451,6 +451,26 @@ body::after {
   font-size:12px; color:var(--dim); letter-spacing:.08em;
   line-height:1.7;
 }
+.dz-samples {
+  display:flex; flex-wrap:wrap; gap:6px;
+  margin-top:2px;
+}
+.dz-vid {
+  background:transparent;
+  border:1px solid var(--border2);
+  color:var(--cyan);
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px; letter-spacing:.04em;
+  padding:5px 10px; border-radius:3px;
+  cursor:pointer; white-space:nowrap;
+  transition:all .15s;
+}
+.dz-vid:hover {
+  border-color:var(--cyan);
+  background:var(--cyan-dim);
+  box-shadow:0 0 8px rgba(0,229,255,.2);
+}
+
 .dz-note {
   font-family:'Share Tech Mono',monospace;
   font-size:11px; color:var(--dim); letter-spacing:.03em;
@@ -737,6 +757,12 @@ function cellHTML(i) {
             <div class="dz-ch">CH${i+1}</div>
             <div class="dz-title">AWAITING SIGNAL</div>
             <div class="dz-subtitle">Paste any URL above and tap GO</div>
+            <div class="dz-samples">
+              <button class="dz-vid" onclick="event.stopPropagation();loadYT(${i},'NmVU5NulA5A')" title="Last Call — Music Video">▶ Last Call</button>
+              <button class="dz-vid" onclick="event.stopPropagation();loadYT(${i},'QECOr-wRevM')" title="Agentic Healthcare Assistant (AHA)">▶ AHA Demo</button>
+              <button class="dz-vid" onclick="event.stopPropagation();loadYT(${i},'s0zfirf2sdk')" title="InsightForge Business Intelligence AI App">▶ InsightForge</button>
+              <button class="dz-vid" onclick="event.stopPropagation();loadYT(${i},'UvSqe8yiZ24')" title="Stillwater Chair Tai Chi &amp; QiGong">▶ Tai Chi</button>
+            </div>
             <div class="dz-note"><span class="dz-note-label">NOTE:</span> Many sites block iFrame embedding (including social media, TV networks, and streaming services).</div>
           </div>
 

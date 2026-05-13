@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JOB SCOUT // Mission Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;600;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --amber: #ffb300;
+    --amber-dim: #c47f00;
+    --amber-glow: rgba(255,179,0,0.15);
+    --amber-faint: rgba(255,179,0,0.05);
+    --red: #ff3b3b;
+    --green: #39ff6e;
+    --blue: #00cfff;
+    --bg: #0a0a0c;
+    --bg2: #101014;
+    --bg3: #16161c;
+    --border: rgba(255,179,0,0.25);
+    --text: #e8d9b0;
+    --text-dim: #8a7a5a;
+    --mono: 'Share Tech Mono', monospace;
+    --display: 'Orbitron', sans-serif;
+    --body: 'Rajdhani', sans-serif;
+  }
+
+- { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: var(–body);
+min-height: 100vh;
+overflow-x: hidden;
+}
+
+/* Scanline overlay */
+body::before {
+content: ‘’;
+position: fixed;
+top: 0; left: 0; right: 0; bottom: 0;
+background: repeating-linear-gradient(
+0deg,
+transparent,
+transparent 2px,
+rgba(0,0,0,0.08) 2px,
+rgba(0,0,0,0.08) 4px
+);
+pointer-events: none;
+z-index: 9999;
+}
+
+/* Grid background */
+body::after {
+content: ‘’;
+position: fixed;
+top: 0; left: 0; right: 0; bottom: 0;
+background-image:
+linear-gradient(rgba(255,179,0,0.04) 1px, transparent 1px),
+linear-gradient(90deg, rgba(255,179,0,0.04) 1px, transparent 1px);
+background-size: 40px 40px;
+pointer-events: none;
+z-index: 0;
+}
+
+.wrapper {
+position: relative;
+z-index: 1;
+max-width: 1100px;
+margin: 0 auto;
+padding: 20px 16px 60px;
+}
+
+/* ── HEADER ── */
+.header {
+border-bottom: 2px solid var(–amber);
+padding-bottom: 16px;
+margin-bottom: 24px;
+display: flex;
+align-items: flex-end;
+justify-content: space-between;
+gap: 12px;
+flex-wrap: wrap;
+}
+
+.header-left h1 {
+font-family: var(–display);
+font-size: clamp(1.4rem, 4vw, 2.2rem);
+font-weight: 900;
+color: var(–amber);
+letter-spacing: 0.12em;
+text-shadow: 0 0 20px var(–amber-dim);
+line-height: 1;
+}
+
+.header-left .subtitle {
+font-family: var(–mono);
+font-size: 0.7rem;
+color: var(–amber-dim);
+letter-spacing: 0.2em;
+margin-top: 4px;
+}
+
+.header-right {
+font-family: var(–mono);
+font-size: 0.65rem;
+color: var(–text-dim);
+text-align: right;
+line-height: 1.8;
+}
+
+#live-clock { color: var(–amber); }
+
+/* ── PANELS ── */
+.panel {
+background: var(–bg2);
+border: 1px solid var(–border);
+border-radius: 2px;
+margin-bottom: 20px;
+overflow: hidden;
+}
+
+.panel-header {
+background: var(–bg3);
+border-bottom: 1px solid var(–border);
+padding: 10px 16px;
+display: flex;
+align-items: center;
+gap: 10px;
+font-family: var(–display);
+font-size: 0.65rem;
+font-weight: 600;
+color: var(–amber);
+letter-spacing: 0.2em;
+}
+
+.panel-header .dot {
+width: 8px; height: 8px;
+background: var(–amber);
+border-radius: 50%;
+box-shadow: 0 0 8px var(–amber);
+flex-shrink: 0;
+}
+
+.panel-header .dot.red { background: var(–red); box-shadow: 0 0 8px var(–red); }
+.panel-header .dot.green { background: var(–green); box-shadow: 0 0 8px var(–green); }
+
+.panel-body { padding: 16px; }
+
+/* ── GRID LAYOUT ── */
+.config-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 20px;
+}
+@media(max-width: 640px) { .config-grid { grid-template-columns: 1fr; } }
+
+/* ── TAGS ── */
+.tag-list {
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+margin-bottom: 10px;
+min-height: 36px;
+}
+
+.tag {
+display: flex;
+align-items: center;
+gap: 6px;
+background: var(–amber-faint);
+border: 1px solid var(–border);
+padding: 4px 10px;
+font-family: var(–mono);
+font-size: 0.65rem;
+color: var(–amber);
+letter-spacing: 0.05em;
+cursor: default;
+}
+
+.tag .remove {
+cursor: pointer;
+color: var(–red);
+font-size: 0.8rem;
+line-height: 1;
+opacity: 0.7;
+transition: opacity 0.2s;
+}
+.tag .remove:hover { opacity: 1; }
+
+/* ── INPUTS ── */
+.input-row {
+display: flex;
+gap: 8px;
+margin-top: 8px;
+}
+
+input[type=“text”] {
+flex: 1;
+background: var(–bg);
+border: 1px solid var(–border);
+color: var(–text);
+font-family: var(–mono);
+font-size: 0.7rem;
+padding: 8px 12px;
+outline: none;
+transition: border-color 0.2s;
+}
+input[type=“text”]:focus { border-color: var(–amber); }
+input[type=“text”]::placeholder { color: var(–text-dim); }
+
+.btn {
+font-family: var(–display);
+font-size: 0.6rem;
+font-weight: 600;
+letter-spacing: 0.15em;
+padding: 8px 14px;
+border: 1px solid;
+cursor: pointer;
+transition: all 0.2s;
+white-space: nowrap;
+}
+
+.btn-amber {
+background: transparent;
+border-color: var(–amber);
+color: var(–amber);
+}
+.btn-amber:hover {
+background: var(–amber);
+color: var(–bg);
+}
+
+.btn-launch {
+background: var(–amber);
+border-color: var(–amber);
+color: var(–bg);
+font-size: 0.75rem;
+padding: 14px 32px;
+display: block;
+width: 100%;
+text-align: center;
+position: relative;
+overflow: hidden;
+}
+.btn-launch:hover:not(:disabled) {
+background: #ffd54f;
+box-shadow: 0 0 30px rgba(255,179,0,0.4);
+}
+.btn-launch:disabled {
+opacity: 0.5;
+cursor: not-allowed;
+}
+
+/* ── PREFS ── */
+.pref-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 10px;
+}
+@media(max-width: 500px) { .pref-grid { grid-template-columns: 1fr; } }
+
+.pref-item {
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 8px 12px;
+background: var(–bg);
+border: 1px solid var(–border);
+cursor: pointer;
+transition: border-color 0.2s;
+}
+.pref-item.active { border-color: var(–amber); background: var(–amber-faint); }
+
+.pref-check {
+width: 14px; height: 14px;
+border: 1px solid var(–border);
+display: flex; align-items: center; justify-content: center;
+flex-shrink: 0;
+font-size: 0.6rem;
+color: var(–amber);
+}
+.pref-item.active .pref-check { border-color: var(–amber); }
+
+.pref-label {
+font-family: var(–mono);
+font-size: 0.65rem;
+color: var(–text-dim);
+line-height: 1.3;
+}
+.pref-item.active .pref-label { color: var(–text); }
+
+/* ── STATUS BAR ── */
+#status-bar {
+font-family: var(–mono);
+font-size: 0.68rem;
+color: var(–amber-dim);
+padding: 10px 16px;
+border-top: 1px solid var(–border);
+min-height: 36px;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+.status-indicator {
+width: 8px; height: 8px;
+border-radius: 50%;
+background: var(–text-dim);
+flex-shrink: 0;
+transition: background 0.3s;
+}
+.status-indicator.running {
+background: var(–green);
+box-shadow: 0 0 8px var(–green);
+animation: pulse 1s infinite;
+}
+.status-indicator.done { background: var(–amber); box-shadow: 0 0 8px var(–amber); }
+.status-indicator.error { background: var(–red); box-shadow: 0 0 8px var(–red); }
+
+@keyframes pulse {
+0%, 100% { opacity: 1; }
+50% { opacity: 0.3; }
+}
+
+/* ── RESULTS ── */
+#results-section { display: none; }
+
+.results-meta {
+display: flex;
+justify-content: space-between;
+align-items: center;
+flex-wrap: wrap;
+gap: 8px;
+padding: 12px 16px;
+background: var(–bg3);
+border-bottom: 1px solid var(–border);
+font-family: var(–mono);
+font-size: 0.65rem;
+color: var(–text-dim);
+}
+
+.results-meta .count { color: var(–amber); font-size: 0.8rem; }
+
+/* ── JOB CARD ── */
+.job-card {
+border-bottom: 1px solid rgba(255,179,0,0.1);
+padding: 18px 16px;
+transition: background 0.2s;
+position: relative;
+}
+.job-card:last-child { border-bottom: none; }
+.job-card:hover { background: var(–amber-faint); }
+
+.job-card-header {
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+gap: 12px;
+margin-bottom: 8px;
+flex-wrap: wrap;
+}
+
+.job-title {
+font-family: var(–display);
+font-size: 0.85rem;
+font-weight: 600;
+color: var(–amber);
+letter-spacing: 0.05em;
+line-height: 1.3;
+}
+
+.job-company {
+font-family: var(–mono);
+font-size: 0.65rem;
+color: var(–blue);
+margin-top: 2px;
+}
+
+.score-badge {
+font-family: var(–display);
+font-size: 0.6rem;
+font-weight: 900;
+padding: 4px 10px;
+border: 1px solid;
+letter-spacing: 0.15em;
+white-space: nowrap;
+flex-shrink: 0;
+}
+.score-hot { border-color: var(–green); color: var(–green); background: rgba(57,255,110,0.08); }
+.score-warm { border-color: var(–amber); color: var(–amber); background: var(–amber-faint); }
+.score-cold { border-color: var(–text-dim); color: var(–text-dim); background: transparent; }
+
+.job-meta {
+display: flex;
+gap: 16px;
+flex-wrap: wrap;
+margin-bottom: 8px;
+}
+
+.job-meta-item {
+font-family: var(–mono);
+font-size: 0.6rem;
+color: var(–text-dim);
+display: flex;
+align-items: center;
+gap: 4px;
+}
+.job-meta-item .icon { color: var(–amber-dim); }
+
+.job-tags {
+display: flex;
+flex-wrap: wrap;
+gap: 6px;
+margin-bottom: 10px;
+}
+.job-skill-tag {
+font-family: var(–mono);
+font-size: 0.55rem;
+padding: 2px 8px;
+background: rgba(0,207,255,0.06);
+border: 1px solid rgba(0,207,255,0.2);
+color: var(–blue);
+letter-spacing: 0.06em;
+}
+.job-skill-tag.vet {
+background: rgba(57,255,110,0.06);
+border-color: rgba(57,255,110,0.25);
+color: var(–green);
+}
+
+.job-summary {
+font-size: 0.85rem;
+font-weight: 300;
+color: var(–text);
+line-height: 1.6;
+margin-bottom: 10px;
+}
+
+.job-why {
+font-family: var(–mono);
+font-size: 0.62rem;
+color: var(–amber-dim);
+border-left: 2px solid var(–amber-dim);
+padding-left: 10px;
+line-height: 1.5;
+margin-bottom: 10px;
+}
+
+.job-actions {
+display: flex;
+gap: 8px;
+flex-wrap: wrap;
+}
+
+.job-link {
+font-family: var(–display);
+font-size: 0.55rem;
+font-weight: 600;
+letter-spacing: 0.12em;
+padding: 5px 12px;
+border: 1px solid var(–border);
+color: var(–text-dim);
+text-decoration: none;
+transition: all 0.2s;
+}
+.job-link:hover {
+border-color: var(–amber);
+color: var(–amber);
+background: var(–amber-faint);
+}
+.job-link.primary {
+border-color: var(–amber);
+color: var(–amber);
+background: var(–amber-faint);
+}
+.job-link.primary:hover {
+background: var(–amber);
+color: var(–bg);
+}
+
+/* ── SUMMARY BLOCK ── */
+.intel-summary {
+font-size: 0.9rem;
+font-weight: 300;
+color: var(–text);
+line-height: 1.7;
+padding: 16px;
+border-left: 3px solid var(–amber);
+background: var(–amber-faint);
+margin: 0 16px 16px;
+font-family: var(–body);
+}
+
+/* ── RAW OUTPUT (scrollable) ── */
+#raw-log {
+display: none;
+background: var(–bg);
+border: 1px solid var(–border);
+padding: 14px;
+font-family: var(–mono);
+font-size: 0.62rem;
+color: var(–text-dim);
+line-height: 1.7;
+max-height: 300px;
+overflow-y: auto;
+margin: 0 16px 16px;
+white-space: pre-wrap;
+}
+
+.toggle-raw {
+font-family: var(–mono);
+font-size: 0.6rem;
+color: var(–text-dim);
+cursor: pointer;
+background: none;
+border: none;
+text-decoration: underline;
+padding: 0 16px 12px;
+display: block;
+letter-spacing: 0.08em;
+}
+.toggle-raw:hover { color: var(–amber); }
+
+/* ── SPINNER ── */
+.spinner {
+display: inline-block;
+width: 12px; height: 12px;
+border: 2px solid var(–amber-dim);
+border-top-color: var(–amber);
+border-radius: 50%;
+animation: spin 0.8s linear infinite;
+flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── DIVIDER ── */
+.section-divider {
+display: flex;
+align-items: center;
+gap: 12px;
+margin: 20px 0;
+font-family: var(–mono);
+font-size: 0.6rem;
+color: var(–text-dim);
+letter-spacing: 0.15em;
+}
+.section-divider::before, .section-divider::after {
+content: ‘’;
+flex: 1;
+height: 1px;
+background: var(–border);
+}
+
+/* ── DISCLAIMER ── */
+.disclaimer {
+font-family: var(–mono);
+font-size: 0.6rem;
+color: var(–text-dim);
+text-align: center;
+padding: 12px;
+border-top: 1px solid var(–border);
+line-height: 1.6;
+}
+
+/* ── LOADING ANIMATION ── */
+.loading-frame {
+text-align: center;
+padding: 40px 20px;
+display: none;
+}
+.loading-frame.visible { display: block; }
+
+.radar {
+width: 80px; height: 80px;
+border: 2px solid var(–border);
+border-radius: 50%;
+margin: 0 auto 16px;
+position: relative;
+animation: radarSpin 2s linear infinite;
+}
+.radar::after {
+content: ‘’;
+position: absolute;
+top: 50%; left: 50%;
+width: 50%;
+height: 2px;
+background: linear-gradient(to right, transparent, var(–amber));
+transform-origin: left center;
+transform: rotate(0deg);
+}
+@keyframes radarSpin {
+to { transform: rotate(360deg); }
+}
+
+.loading-text {
+font-family: var(–mono);
+font-size: 0.7rem;
+color: var(–amber-dim);
+letter-spacing: 0.15em;
+}
+
+#loading-msg {
+display: block;
+margin-top: 8px;
+color: var(–text-dim);
+font-size: 0.62rem;
+animation: blink 1.2s step-end infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+</style>
+
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+
+  <div class="header">
+    <div class="header-left">
+      <h1>◈ CIBOLA JOB SCOUT</h1>
+      <div class="subtitle">// AGENTIC INTELLIGENCE DAILY MISSION BRIEFING SYSTEM</div>
+    </div>
+    <div class="header-right">
+      <div id="live-clock">--:--:-- UTC</div>
+      <div>OPERATOR: D. FLIESEN // CIBOLA STUDIOS</div>
+      <div>CLEARANCE: AI+MULTIMEDIA HYBRID</div>
+    </div>
+  </div>
+
+  <!-- TARGET COMPANIES -->
+
+  <div class="panel">
+    <div class="panel-header"><span class="dot"></span> TARGET COMPANIES</div>
+    <div class="panel-body">
+      <div class="tag-list" id="companies-list"></div>
+      <div class="input-row">
+        <input type="text" id="company-input" placeholder="Add company (e.g. Adobe, NVIDIA)..." maxlength="50">
+        <button class="btn btn-amber" onclick="addTag('company')">+ ADD</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIG GRID -->
+
+  <div class="config-grid">
+
+```
+<!-- SKILL KEYWORDS -->
+<div class="panel">
+  <div class="panel-header"><span class="dot green"></span> SKILL KEYWORDS</div>
+  <div class="panel-body">
+    <div class="tag-list" id="skills-list"></div>
+    <div class="input-row">
+      <input type="text" id="skill-input" placeholder="Add keyword..." maxlength="40">
+      <button class="btn btn-amber" onclick="addTag('skill')">+ ADD</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOCATIONS -->
+<div class="panel">
+  <div class="panel-header"><span class="dot"></span> LOCATIONS / WORK MODE</div>
+  <div class="panel-body">
+    <div class="tag-list" id="locations-list"></div>
+    <div class="input-row">
+      <input type="text" id="location-input" placeholder="Add location or 'Remote'..." maxlength="40">
+      <button class="btn btn-amber" onclick="addTag('location')">+ ADD</button>
+    </div>
+  </div>
+</div>
+```
+
+  </div>
+
+  <!-- SEARCH PREFERENCES -->
+
+  <div class="panel">
+    <div class="panel-header"><span class="dot red"></span> SEARCH PREFERENCES</div>
+    <div class="panel-body">
+      <div class="pref-grid" id="prefs-grid"></div>
+    </div>
+  </div>
+
+  <!-- LAUNCH -->
+
+  <div class="panel">
+    <div class="panel-body" style="padding:16px;">
+      <button class="btn btn-launch" id="launch-btn" onclick="launchScout()">
+        ◈ LAUNCH DAILY SCOUT MISSION
+      </button>
+    </div>
+    <div id="status-bar">
+      <span class="status-indicator" id="status-dot"></span>
+      <span id="status-text">SYSTEM READY // Configure targets and launch mission.</span>
+    </div>
+  </div>
+
+  <!-- LOADING FRAME -->
+
+  <div class="loading-frame" id="loading-frame">
+    <div class="radar"></div>
+    <div class="loading-text">SCANNING INTELLIGENCE NETWORKS</div>
+    <span id="loading-msg">Initializing agentic search protocols...</span>
+  </div>
+
+  <!-- RESULTS SECTION -->
+
+  <div id="results-section">
+
+```
+<div class="section-divider">MISSION BRIEFING // INTEL REPORT</div>
+
+<div class="panel" id="summary-panel">
+  <div class="panel-header"><span class="dot green"></span> SCOUT SUMMARY</div>
+  <div class="intel-summary" id="summary-text"></div>
+</div>
+
+<div class="panel" id="results-panel">
+  <div class="panel-header"><span class="dot"></span> OPPORTUNITY LEADS</div>
+  <div class="results-meta">
+    <div>LEADS IDENTIFIED: <span class="count" id="lead-count">0</span></div>
+    <div id="scan-time"></div>
+  </div>
+  <div id="job-cards-container"></div>
+</div>
+
+<button class="toggle-raw" onclick="toggleRaw()">[ TOGGLE RAW INTEL LOG ]</button>
+<pre id="raw-log"></pre>
+
+<div class="disclaimer">
+  ⚠ CIBOLA JOB SCOUT uses AI-powered web search. Leads are algorithmically identified — verify all postings before applying.
+  Direct links are generated based on known career portals. Always apply through official company channels.
+</div>
+```
+
+  </div>
+
+</div>
+
+<script>
+// ── STATE ──
+const state = {
+  companies: ['Adobe', 'OpenAI', 'Anthropic', 'Google', 'Microsoft', 'NVIDIA', 'Meta AI'],
+  skills: ['Generative AI', 'LLM', 'Multimedia', 'Python', 'FastAPI', 'Creative Technology', 'Computer Vision', 'Prompt Engineering'],
+  locations: ['Remote', 'Summerville SC', 'North Charleston SC', 'Goose Creek SC'],
+  prefs: {
+    'Disabled Veteran Friendly': true,
+    'Remote / Hybrid Only': true,
+    'No Relocation Required': true,
+    'Travel Acceptable': true,
+    'AI + Creative Overlap': true,
+    'DoD / Defense Sector': false,
+    'Startup / Scaleup': true,
+    'Enterprise / Corp': true,
+  }
+};
+
+// ── CLOCK ──
+function updateClock() {
+  const now = new Date();
+  document.getElementById('live-clock').textContent =
+    now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── RENDER TAGS ──
+function renderTags(type) {
+  const list = document.getElementById(`${type}s-list`) || document.getElementById(`${type}-list`);
+  if (!list) return;
+  list.innerHTML = '';
+  const arr = type === 'company' ? state.companies :
+               type === 'skill' ? state.skills : state.locations;
+  arr.forEach((item, i) => {
+    const tag = document.createElement('div');
+    tag.className = 'tag';
+    tag.innerHTML = `${item} <span class="remove" onclick="removeTag('${type}', ${i})">✕</span>`;
+    list.appendChild(tag);
+  });
+}
+
+function addTag(type) {
+  const input = document.getElementById(`${type}-input`);
+  const val = input.value.trim();
+  if (!val) return;
+  const arr = type === 'company' ? state.companies :
+               type === 'skill' ? state.skills : state.locations;
+  if (!arr.includes(val)) arr.push(val);
+  input.value = '';
+  renderTags(type);
+}
+
+function removeTag(type, i) {
+  const arr = type === 'company' ? state.companies :
+               type === 'skill' ? state.skills : state.locations;
+  arr.splice(i, 1);
+  renderTags(type);
+}
+
+// Enter key support
+['company', 'skill', 'location'].forEach(type => {
+  const input = document.getElementById(`${type}-input`);
+  if (input) input.addEventListener('keydown', e => { if (e.key === 'Enter') addTag(type); });
+});
+
+// ── RENDER PREFS ──
+function renderPrefs() {
+  const grid = document.getElementById('prefs-grid');
+  grid.innerHTML = '';
+  Object.entries(state.prefs).forEach(([label, active]) => {
+    const item = document.createElement('div');
+    item.className = `pref-item ${active ? 'active' : ''}`;
+    item.onclick = () => {
+      state.prefs[label] = !state.prefs[label];
+      renderPrefs();
+    };
+    item.innerHTML = `
+      <div class="pref-check">${active ? '✓' : ''}</div>
+      <div class="pref-label">${label}</div>
+    `;
+    grid.appendChild(item);
+  });
+}
+
+// ── STATUS ──
+function setStatus(state_str, msg) {
+  const dot = document.getElementById('status-dot');
+  const text = document.getElementById('status-text');
+  dot.className = `status-indicator ${state_str}`;
+  text.textContent = msg;
+}
+
+// ── LOADING MESSAGES ──
+const loadingMessages = [
+  'Initializing agentic search protocols...',
+  'Scanning target company career portals...',
+  'Cross-referencing skill keywords...',
+  'Filtering for remote/hybrid eligibility...',
+  'Checking veteran-friendly designations...',
+  'Ranking opportunities by profile match...',
+  'Assembling mission briefing...',
+];
+let loadingMsgInterval;
+let loadingMsgIdx = 0;
+
+function startLoadingMessages() {
+  loadingMsgIdx = 0;
+  const el = document.getElementById('loading-msg');
+  el.textContent = loadingMessages[0];
+  loadingMsgInterval = setInterval(() => {
+    loadingMsgIdx = (loadingMsgIdx + 1) % loadingMessages.length;
+    el.textContent = loadingMessages[loadingMsgIdx];
+  }, 2500);
+}
+
+function stopLoadingMessages() {
+  clearInterval(loadingMsgInterval);
+}
+
+// ── BUILD PROMPT ──
+function buildPrompt() {
+  const activePrefs = Object.entries(state.prefs)
+    .filter(([,v]) => v).map(([k]) => k).join(', ');
+
+  return `You are an expert job search intelligence agent helping a highly specialized candidate find ideal job opportunities.
+
+CANDIDATE PROFILE:
+- Name: David Fliesen (use initials D.F. if needed, never full email)
+- Title: Hybrid AI & Multimedia Developer
+- Location: Summerville/Charleston SC — strongly prefers remote or local SC work
+- Background: 20+ years multimedia production (Navy Combat Camera photojournalist), 15+ years AI
+- Key Skills: Generative AI (LangChain, LangGraph, RAG, FAISS), Python, FastAPI, Streamlit, Groq LLMs, D-ID avatars, Adobe CC, 3D/animation (iClone, Blender, Maya), FLUX image generation, comic/narrative AI, React, GitHub Pages
+- Portfolio: davidfliesen.github.io
+- Notable work: AHA Healthcare AI agent, InsightForge BI dashboard, Aladdin's News Genie, Sisters of Summerville daily AI comic strip, ComicsGen app
+- Education: Purdue Applied Generative AI Specialization, BFA Media Arts
+- Special status: Disabled Veteran — work-from-home strongly preferred; paid travel acceptable
+- NOT willing to relocate
+
+SEARCH TARGETS:
+Companies: ${state.companies.join(', ')}
+Skills/Keywords: ${state.skills.join(', ')}
+Locations Acceptable: ${state.locations.join(', ')}
+Active Preferences: ${activePrefs}
+
+MISSION: Search the web RIGHT NOW for current open job postings (posted in the last 30-60 days ideally) that match this candidate's profile. Look at each company's careers page, LinkedIn, Indeed, and job boards.
+
+For each opportunity found, provide a structured JSON response. Find as many strong matches as possible (aim for 5-10 leads).
+
+CRITICAL: Respond ONLY with a valid JSON object, no markdown, no backticks, no preamble. Format:
+
+{
+  "summary": "2-3 sentence executive summary of today's opportunity landscape for this candidate",
+  "scan_timestamp": "ISO timestamp",
+  "leads": [
+    {
+      "title": "Job Title",
+      "company": "Company Name",
+      "location": "Location or Remote",
+      "work_mode": "Remote|Hybrid|On-site",
+      "match_score": "HOT|WARM|COLD",
+      "match_reason": "1-2 sentences why this is a strong match for D.F.'s specific background",
+      "summary": "2-3 sentence description of the role and what makes it relevant",
+      "skill_tags": ["tag1", "tag2"],
+      "veteran_friendly": true or false,
+      "apply_url": "direct URL to job posting or careers page",
+      "source": "LinkedIn|Indeed|Company Careers|etc"
+    }
+  ]
+}`;
+}
+
+// ── LAUNCH ──
+async function launchScout() {
+  const btn = document.getElementById('launch-btn');
+  btn.disabled = true;
+
+  document.getElementById('results-section').style.display = 'none';
+  document.getElementById('loading-frame').classList.add('visible');
+  setStatus('running', 'MISSION ACTIVE // Agentic scout deployed — scanning opportunity networks...');
+  startLoadingMessages();
+
+  const startTime = Date.now();
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        messages: [{ role: 'user', content: buildPrompt() }]
+      })
+    });
+
+    const data = await response.json();
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+
+    // Collect all text blocks
+    const rawText = (data.content || [])
+      .filter(b => b.type === 'text')
+      .map(b => b.text)
+      .join('\n');
+
+    document.getElementById('raw-log').textContent = rawText;
+
+    // Parse JSON
+    let result;
+    try {
+      const clean = rawText.replace(/```json|```/g, '').trim();
+      // Find first { to last }
+      const start = clean.indexOf('{');
+      const end = clean.lastIndexOf('}');
+      result = JSON.parse(clean.slice(start, end + 1));
+    } catch(e) {
+      throw new Error('Intel parse failure — AI response was not valid JSON. Raw log available below.');
+    }
+
+    renderResults(result, elapsed);
+    stopLoadingMessages();
+    document.getElementById('loading-frame').classList.remove('visible');
+    setStatus('done', `MISSION COMPLETE // ${result.leads?.length || 0} leads identified in ${elapsed}s. Briefing ready.`);
+
+  } catch(err) {
+    stopLoadingMessages();
+    document.getElementById('loading-frame').classList.remove('visible');
+    setStatus('error', `MISSION FAULT // ${err.message}`);
+    // Show raw log anyway
+    document.getElementById('results-section').style.display = 'block';
+    document.getElementById('summary-panel').style.display = 'none';
+    document.getElementById('results-panel').style.display = 'none';
+  }
+
+  btn.disabled = false;
+}
+
+// ── RENDER RESULTS ──
+function renderResults(data, elapsed) {
+  const section = document.getElementById('results-section');
+  section.style.display = 'block';
+
+  document.getElementById('summary-panel').style.display = '';
+  document.getElementById('results-panel').style.display = '';
+
+  // Summary
+  document.getElementById('summary-text').textContent = data.summary || 'No summary available.';
+
+  // Lead count
+  const leads = data.leads || [];
+  document.getElementById('lead-count').textContent = leads.length;
+  document.getElementById('scan-time').textContent = `SCAN DURATION: ${elapsed}s // ${new Date().toUTCString()}`;
+
+  // Job cards
+  const container = document.getElementById('job-cards-container');
+  container.innerHTML = '';
+
+  if (leads.length === 0) {
+    container.innerHTML = '<div style="padding:24px;font-family:var(--mono);color:var(--text-dim);font-size:0.7rem;text-align:center;">NO LEADS IDENTIFIED // Broaden search parameters and retry.</div>';
+    return;
+  }
+
+  leads.forEach((job, i) => {
+    const scoreClass = job.match_score === 'HOT' ? 'score-hot' :
+                       job.match_score === 'WARM' ? 'score-warm' : 'score-cold';
+    const skillTagsHTML = (job.skill_tags || []).map(t =>
+      `<span class="job-skill-tag">${t}</span>`).join('');
+    const vetTag = job.veteran_friendly
+      ? '<span class="job-skill-tag vet">⊕ VET FRIENDLY</span>' : '';
+
+    const applyUrl = job.apply_url && job.apply_url.startsWith('http')
+      ? job.apply_url
+      : `https://www.google.com/search?q=${encodeURIComponent(job.title + ' ' + job.company + ' job apply')}`;
+
+    const card = document.createElement('div');
+    card.className = 'job-card';
+    card.innerHTML = `
+      <div class="job-card-header">
+        <div>
+          <div class="job-title">${String(i+1).padStart(2,'0')} // ${job.title || 'Untitled Role'}</div>
+          <div class="job-company">◈ ${job.company || 'Unknown'} &nbsp;|&nbsp; ${job.location || 'See posting'}</div>
+        </div>
+        <div class="score-badge ${scoreClass}">${job.match_score || '—'}</div>
+      </div>
+      <div class="job-meta">
+        <div class="job-meta-item"><span class="icon">⊞</span> ${job.work_mode || 'See posting'}</div>
+        <div class="job-meta-item"><span class="icon">⊡</span> ${job.source || 'Web'}</div>
+      </div>
+      <div class="job-tags">${skillTagsHTML}${vetTag}</div>
+      <div class="job-summary">${job.summary || ''}</div>
+      ${job.match_reason ? `<div class="job-why">◈ WHY THIS FITS: ${job.match_reason}</div>` : ''}
+      <div class="job-actions">
+        <a href="${applyUrl}" target="_blank" rel="noopener noreferrer" class="job-link primary">→ VIEW POSTING</a>
+        <a href="https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(job.title + ' ' + job.company)}" target="_blank" rel="noopener noreferrer" class="job-link">LINKEDIN</a>
+        <a href="https://www.indeed.com/jobs?q=${encodeURIComponent(job.title + ' ' + job.company)}" target="_blank" rel="noopener noreferrer" class="job-link">INDEED</a>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  section.scrollIntoView({ behavior: 'smooth' });
+}
+
+// ── TOGGLE RAW ──
+function toggleRaw() {
+  const log = document.getElementById('raw-log');
+  log.style.display = log.style.display === 'block' ? 'none' : 'block';
+}
+
+// ── INIT ──
+renderTags('company');
+renderTags('skill');
+renderTags('location');
+renderPrefs();
+</script>
+
+</body>
+</html>

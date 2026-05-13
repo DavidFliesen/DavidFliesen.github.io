@@ -609,7 +609,10 @@ animation: blink 1.2s step-end infinite;
 </div>
 
 <div class="panel">
-  <div class="panel-header"><span class="dot red"></span> SEARCH PREFERENCES</div>
+  <div class="panel-header" style="justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:10px;"><span class="dot red"></span> SEARCH PREFERENCES</div>
+    <button class="btn btn-amber" style="font-size:0.5rem;padding:4px 10px;" onclick="resetState()">RESET ALL DEFAULTS</button>
+  </div>
   <div class="panel-body">
     <div class="pref-grid" id="prefs-grid"></div>
   </div>
@@ -656,7 +659,7 @@ animation: blink 1.2s step-end infinite;
 
 </div>
 <script>
-var state = {
+var DEFAULTS = {
   companies: ['Adobe', 'OpenAI', 'Anthropic', 'Google', 'Microsoft', 'NVIDIA', 'Meta AI'],
   skills: ['Generative AI', 'LLM', 'Multimedia', 'Python', 'FastAPI', 'Creative Technology', 'Computer Vision', 'Prompt Engineering'],
   locations: ['Remote', 'Summerville SC', 'North Charleston SC', 'Goose Creek SC'],
@@ -671,6 +674,47 @@ var state = {
     'Enterprise / Corp': true
   }
 };
+
+function loadState() {
+try {
+var saved = localStorage.getItem(‘cibola_scout_state’);
+if (saved) {
+var parsed = JSON.parse(saved);
+return {
+companies: parsed.companies || DEFAULTS.companies.slice(),
+skills: parsed.skills || DEFAULTS.skills.slice(),
+locations: parsed.locations || DEFAULTS.locations.slice(),
+prefs: parsed.prefs || JSON.parse(JSON.stringify(DEFAULTS.prefs))
+};
+}
+} catch(e) {}
+return {
+companies: DEFAULTS.companies.slice(),
+skills: DEFAULTS.skills.slice(),
+locations: DEFAULTS.locations.slice(),
+prefs: JSON.parse(JSON.stringify(DEFAULTS.prefs))
+};
+}
+
+function saveState() {
+try {
+localStorage.setItem(‘cibola_scout_state’, JSON.stringify(state));
+} catch(e) {}
+}
+
+function resetState() {
+state.companies = DEFAULTS.companies.slice();
+state.skills = DEFAULTS.skills.slice();
+state.locations = DEFAULTS.locations.slice();
+state.prefs = JSON.parse(JSON.stringify(DEFAULTS.prefs));
+saveState();
+renderTags(‘company’);
+renderTags(‘skill’);
+renderTags(‘location’);
+renderPrefs();
+}
+
+var state = loadState();
 
 window.onload = function() {
 renderTags(‘company’);
@@ -716,12 +760,14 @@ if (!val) return;
 var arr = type === ‘company’ ? state.companies : type === ‘skill’ ? state.skills : state.locations;
 if (arr.indexOf(val) === -1) arr.push(val);
 input.value = ‘’;
+saveState();
 renderTags(type);
 }
 
 function removeTag(type, i) {
 var arr = type === ‘company’ ? state.companies : type === ‘skill’ ? state.skills : state.locations;
 arr.splice(i, 1);
+saveState();
 renderTags(type);
 }
 
@@ -740,7 +786,7 @@ var active = state.prefs[label];
 var item = document.createElement(‘div’);
 item.className = ‘pref-item’ + (active ? ’ active’ : ‘’);
 item.onclick = (function(lbl) {
-return function() { state.prefs[lbl] = !state.prefs[lbl]; renderPrefs(); };
+return function() { state.prefs[lbl] = !state.prefs[lbl]; saveState(); renderPrefs(); };
 })(label);
 var check = document.createElement(‘div’);
 check.className = ‘pref-check’;

@@ -672,6 +672,13 @@ var state = {
   }
 };
 
+window.onload = function() {
+renderTags(‘company’);
+renderTags(‘skill’);
+renderTags(‘location’);
+renderPrefs();
+};
+
 function updateClock() {
 var now = new Date();
 var el = document.getElementById(‘live-clock’);
@@ -889,11 +896,6 @@ var log = document.getElementById(‘raw-log’);
 log.style.display = log.style.display === ‘block’ ? ‘none’ : ‘block’;
 }
 
-renderTags(‘company’);
-renderTags(‘skill’);
-renderTags(‘location’);
-renderPrefs();
 </script>
-
 </body>
 </html>

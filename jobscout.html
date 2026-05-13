@@ -681,8 +681,8 @@ setInterval(updateClock, 1000);
 updateClock();
 
 function renderTags(type) {
-var listId = type + ‘s-list’;
-var list = document.getElementById(listId);
+var idMap = { company: ‘companies-list’, skill: ‘skills-list’, location: ‘locations-list’ };
+var list = document.getElementById(idMap[type]);
 if (!list) return;
 var arr = type === ‘company’ ? state.companies : type === ‘skill’ ? state.skills : state.locations;
 list.innerHTML = ‘’;
